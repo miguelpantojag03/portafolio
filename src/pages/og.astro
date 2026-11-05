@@ -1,0 +1,79 @@
+---
+/**
+ * Plantilla de la imagen para compartir (1200×630). No se publica en el sitemap:
+ * `npm run og` la captura y la guarda en public/og.png.
+ */
+import '@fontsource-variable/archivo/wdth.css';
+import '@/styles/tokens.css';
+import { perfil } from '@/data/perfil';
+---
+
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Imagen para compartir</title>
+  </head>
+  <body>
+    <div class="og">
+      <p class="og__nombre">
+        Miguel Ángel
+        <br />
+        Pantoja Guerra
+      </p>
+      <p class="og__rol">
+        {perfil.rol} en {perfil.ciudad}
+      </p>
+      <p class="og__que">{perfil.queHago}</p>
+    </div>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+  }
+
+  /* Azul arriba, franja de cancha abajo: los dos colores del sitio. */
+  .og {
+    width: 1200px;
+    height: 630px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 22px;
+    padding: 64px 64px 150px;
+    font-family: var(--familia);
+    color: #e6eeff;
+    background:
+      repeating-linear-gradient(90deg, #0b7a4b 0 100px, #0a6e44 100px 200px) bottom / 100% 110px no-repeat,
+      #1d3fe0;
+  }
+
+  .og p {
+    margin: 0;
+  }
+
+  .og__nombre {
+    font-size: 84px;
+    padding-top: 0.12em;
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 0.88;
+    text-transform: uppercase;
+  }
+
+  .og__rol {
+    font-size: 34px;
+    font-weight: 500;
+  }
+
+  .og__que {
+    font-size: 30px;
+    font-stretch: 110%;
+    font-weight: 750;
+    color: #34d399;
+  }
+</style>

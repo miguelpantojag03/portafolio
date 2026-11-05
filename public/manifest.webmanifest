@@ -1,0 +1,12 @@
+{
+  "name": "Miguel Ángel Pantoja Guerra",
+  "short_name": "Miguel Pantoja",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "background_color": "#e6eeff",
+  "theme_color": "#1d3fe0",
+  "display": "browser",
+  "lang": "es-CO"
+}

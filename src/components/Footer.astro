@@ -1,0 +1,48 @@
+<footer class="pie">
+  <div class="contenedor pie__fila">
+    <p>
+      <a href="https://github.com/miguelpantojag03/portafolio" rel="noopener" target="_blank">
+        Código de este sitio<span class="solo-lectores"> (se abre en otra pestaña)</span>
+      </a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    border-top: var(--trazo) solid var(--tinta);
+    padding-block: var(--e-7);
+    font-size: 0.9375rem;
+  }
+
+  .pie__fila {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--e-3) var(--e-6);
+  }
+
+  .pie a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+</style>
+
+<script>
+  import { mostrarAviso } from '@/scripts/aviso';
+
+  // Easter egg: escribir «gol» fuera de un campo de texto.
+  let buffer = '';
+  document.addEventListener('keydown', (e) => {
+    const t = e.target as HTMLElement;
+    if (t.closest('input, textarea, [contenteditable]') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key.length !== 1) return;
+    buffer = (buffer + e.key.toLowerCase()).slice(-3);
+    if (buffer === 'gol') {
+      buffer = '';
+      document.dispatchEvent(new CustomEvent('portafolio:gol'));
+      mostrarAviso('¡Gooool! Si llegaste hasta aquí, hablemos: de software o de fútbol.', 'info', 4500);
+    }
+  });
+</script>

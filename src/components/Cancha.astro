@@ -1,0 +1,495 @@
+---
+/**
+ * Pizarra táctica: cada proyecto ocupa una posición en la cancha y Miguel juega de 10, en el medio,
+ * el que conecta todo. Elegir una posición dibuja el pase y muestra el proyecto.
+ * Las posiciones son botones reales: funciona con teclado y lector de pantalla. Arrastrar al jugador es un extra.
+ */
+import { obtenerProyectos } from '@/lib/proyectos';
+
+/** Coordenadas en unidades del viewBox (100 × 140). La portería de ataque está arriba. */
+const posiciones: Record<string, { x: number; y: number; puesto: string; corto: string }> = {
+  ascua: { x: 50, y: 26, puesto: 'Delantero', corto: 'Ascua' },
+  hp: { x: 19, y: 56, puesto: 'Extremo izquierdo', corto: 'HP' },
+  kalma: { x: 81, y: 56, puesto: 'Extremo derecho', corto: 'Kalma' },
+  prestalab: { x: 50, y: 114, puesto: 'Defensa central', corto: 'PrestaLab' },
+};
+const jugador = { x: 50, y: 84 };
+
+const proyectos = (await obtenerProyectos()).filter((p) => posiciones[p.id]);
+const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
+---
+
+<figure class="pizarra" data-pizarra>
+  <div class="cancha" data-cancha>
+    <svg class="cancha__lineas" viewBox="0 0 100 140" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="franjas" width="100" height="20" patternUnits="userSpaceOnUse">
+          <rect width="100" height="10" style="fill: var(--cancha)"></rect>
+          <rect y="10" width="100" height="10" style="fill: var(--cancha-2)"></rect>
+        </pattern>
+        <marker
+          id="punta"
+          viewBox="0 0 10 10"
+          refX="7"
+          refY="5"
+          markerWidth="5"
+          markerHeight="5"
+          orient="auto"
+        >
+          <path d="M0 0 10 5 0 10z" style="fill: var(--cal)"></path>
+        </marker>
+      </defs>
+      <rect width="100" height="140" fill="url(#franjas)"></rect>
+      <g fill="none" style="stroke: var(--cal)" stroke-width="0.6" opacity="0.85">
+        <rect x="5" y="5" width="90" height="130"></rect>
+        <line x1="5" y1="70" x2="95" y2="70"></line>
+        <circle cx="50" cy="70" r="11"></circle>
+        <rect x="24" y="5" width="52" height="20"></rect>
+        <rect x="37" y="5" width="26" height="8"></rect>
+        <rect x="24" y="115" width="52" height="20"></rect>
+        <rect x="37" y="127" width="26" height="8"></rect>
+        <path d="M40 25a12 12 0 0 0 20 0M40 115a12 12 0 0 1 20 0"></path>
+      </g>
+      <rect
+        class="cancha__arco"
+        data-arco
+        x="42"
+        y="1.5"
+        width="16"
+        height="3.5"
+        fill="none"
+        style="stroke: var(--cal)"
+        stroke-width="0.8"
+      ></rect>
+      <path
+        class="cancha__pase"
+        data-pase
+        fill="none"
+        style="stroke: var(--cal)"
+        stroke-width="1.3"
+        stroke-linecap="round"
+        stroke-dasharray="2.5 2"
+        marker-end="url(#punta)"
+        d=""
+      ></path>
+    </svg>
+
+    <div class="jugador" data-jugador style={pct(jugador.x, jugador.y)} aria-hidden="true" title="Arrástrame">
+      10
+    </div>
+    <div class="balon" data-balon aria-hidden="true"></div>
+
+    {proyectos.map((p, i) => {
+      const pos = posiciones[p.id]!;
+      return (
+        <button
+          type="button"
+          class="posicion"
+          style={pct(pos.x, pos.y)}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+          aria-controls="jugada"
+          data-posicion
+          data-x={pos.x}
+          data-y={pos.y}
+          data-puesto={pos.puesto}
+          data-titulo={p.data.titulo}
+          data-resumen={p.data.resumen}
+          data-area={p.data.area}
+          data-url={`/proyectos/${p.id}`}
+        >
+          <span class="posicion__punto" aria-hidden="true" />
+          <span class="posicion__nombre">{pos.corto}</span>
+          <span class="solo-lectores">, {pos.puesto}</span>
+        </button>
+      );
+    })}
+  </div>
+
+  <figcaption class="jugada" id="jugada" aria-live="polite" data-jugada>
+    {proyectos[0] && (
+      <>
+        <p class="jugada__puesto">
+          {posiciones[proyectos[0].id]!.puesto} · {proyectos[0].data.area}
+        </p>
+        <p class="jugada__titulo">{proyectos[0].data.titulo}</p>
+        <p class="jugada__resumen">{proyectos[0].data.resumen}</p>
+        <a class="jugada__enlace" href={`/proyectos/${proyectos[0].id}`}>
+          Ver caso de estudio
+        </a>
+      </>
+    )}
+  </figcaption>
+  <p class="pizarra__ayuda">
+    Toca una posición para ver el proyecto que juega ahí. Yo juego de 10: conecto todo.
+  </p>
+</figure>
+
+<style>
+  .pizarra {
+    display: grid;
+    gap: var(--e-4);
+    max-width: 30rem;
+    width: 100%;
+    justify-self: end;
+  }
+
+  .cancha {
+    position: relative;
+    aspect-ratio: 100 / 140;
+    border-radius: var(--radio-tarjeta);
+    overflow: hidden;
+    box-shadow:
+      0 0 0 6px var(--superficie),
+      0 30px 60px -30px color-mix(in srgb, var(--azul) 60%, transparent);
+    touch-action: none;
+  }
+
+  .cancha__lineas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cancha__pase {
+    filter: drop-shadow(0 0 1.5px color-mix(in srgb, var(--cal) 70%, transparent));
+  }
+
+  .cancha__arco.vibrar {
+    animation: red 500ms var(--curva-rebote);
+  }
+
+  @keyframes red {
+    30% {
+      transform: translateY(-1.2px) scaleX(1.06);
+    }
+    60% {
+      transform: translateY(0.6px);
+    }
+  }
+
+  .cancha__arco {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* Posiciones: botones circulares con su nombre debajo. */
+  .posicion {
+    position: absolute;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--cal);
+    transform: translate(-50%, -30%);
+    cursor: pointer;
+  }
+
+  .posicion__punto {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--hielo);
+    border: 3px solid var(--marino);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cal) 70%, transparent);
+    transition:
+      transform var(--dur-media) var(--curva-rebote),
+      background-color var(--dur-corta) var(--curva);
+  }
+
+  .posicion__nombre {
+    padding: 1px 8px;
+    border-radius: var(--radio-boton);
+    background: color-mix(in srgb, var(--marino) 78%, transparent);
+    color: var(--hielo);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .posicion:hover .posicion__punto {
+    transform: scale(1.18);
+  }
+
+  .posicion[aria-pressed='true'] .posicion__punto {
+    background: var(--verde-vivo);
+    transform: scale(1.25);
+    animation: latido 1.8s var(--curva) infinite;
+  }
+
+  .posicion[aria-pressed='true'] .posicion__nombre {
+    background: var(--hielo);
+    color: var(--marino);
+  }
+
+  .posicion:focus-visible {
+    outline: none;
+  }
+
+  .posicion:focus-visible .posicion__punto {
+    outline: 3px solid var(--hielo);
+    outline-offset: 3px;
+  }
+
+  @keyframes latido {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--verde-vivo) 70%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 14px transparent;
+    }
+  }
+
+  /* El jugador: Miguel, el 10. Se puede arrastrar. */
+  .jugador {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--azul);
+    color: var(--hielo);
+    border: 3px solid var(--cal);
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: 1.25rem;
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 8px 18px -6px rgb(8 22 52 / 0.6);
+    z-index: 2;
+  }
+
+  .jugador:active {
+    cursor: grabbing;
+  }
+
+  .balon {
+    position: absolute;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--hielo), var(--cal) 60%, #7fa695);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .jugada {
+    display: grid;
+    gap: var(--e-1);
+    padding: var(--e-5);
+    border-radius: var(--radio-tarjeta);
+    background: var(--superficie);
+  }
+
+  .jugada__puesto {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--tinta-suave);
+  }
+
+  .jugada__titulo {
+    font-size: var(--t-3);
+    font-stretch: 115%;
+    font-weight: 850;
+    line-height: 1.05;
+  }
+
+  .jugada__resumen {
+    margin-top: var(--e-1);
+  }
+
+  .jugada__enlace {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 700;
+    color: var(--accion);
+  }
+
+  .jugada.cambio {
+    animation: aparecer var(--dur-media) var(--curva);
+  }
+
+  @keyframes aparecer {
+    from {
+      opacity: 0.2;
+      transform: translateY(6px);
+    }
+  }
+
+  .pizarra__ayuda {
+    font-size: 0.875rem;
+    color: var(--tinta-suave);
+  }
+
+  @media (max-width: 64rem) {
+    .pizarra {
+      justify-self: stretch;
+      max-width: 34rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .posicion[aria-pressed='true'] .posicion__punto {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const reducir = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-pizarra]').forEach((pizarra) => {
+    const cancha = pizarra.querySelector<HTMLElement>('[data-cancha]')!;
+    const pase = pizarra.querySelector<SVGPathElement>('[data-pase]')!;
+    const jugador = pizarra.querySelector<HTMLElement>('[data-jugador]')!;
+    const balon = pizarra.querySelector<HTMLElement>('[data-balon]')!;
+    const arco = pizarra.querySelector<SVGRectElement>('[data-arco]')!;
+    const jugada = pizarra.querySelector<HTMLElement>('[data-jugada]')!;
+    const botones = Array.from(pizarra.querySelectorAll<HTMLButtonElement>('[data-posicion]'));
+
+    const yo = { x: 50, y: 84 };
+    let actual = botones[0];
+
+    const aPorcentaje = (x: number, y: number) => ({ left: `${x}%`, top: `${(y / 140) * 100}%` });
+
+    /** Curva del jugador a la posición, que se detiene antes del punto. */
+    function trazar(destino: HTMLButtonElement, animar: boolean) {
+      const zx = Number(destino.dataset.x);
+      const zy = Number(destino.dataset.y);
+      const dx = zx - yo.x;
+      const dy = zy - yo.y;
+      const largo = Math.hypot(dx, dy) || 1;
+      const fin = { x: zx - (dx / largo) * 7, y: zy - (dy / largo) * 7 };
+      const inicio = { x: yo.x + (dx / largo) * 6, y: yo.y + (dy / largo) * 6 };
+      // Punto de control desplazado en perpendicular: el pase hace una curva.
+      const c = {
+        x: (inicio.x + fin.x) / 2 - (dy / largo) * 10,
+        y: (inicio.y + fin.y) / 2 + (dx / largo) * 10,
+      };
+      pase.setAttribute('d', `M${inicio.x} ${inicio.y} Q${c.x} ${c.y} ${fin.x} ${fin.y}`);
+
+      if (animar && !reducir.matches) {
+        const total = pase.getTotalLength();
+        pase.animate(
+          [
+            { strokeDasharray: `${total} ${total}`, strokeDashoffset: total },
+            { strokeDasharray: `${total} ${total}`, strokeDashoffset: 0 },
+          ],
+          { duration: 520, easing: 'cubic-bezier(.2,.7,.1,1)' },
+        );
+      }
+    }
+
+    function elegir(boton: HTMLButtonElement, animar = true) {
+      actual = boton;
+      botones.forEach((b) => b.setAttribute('aria-pressed', String(b === boton)));
+      const d = boton.dataset;
+      jugada.innerHTML = '';
+      const linea = (clase: string, texto: string) => {
+        const p = document.createElement('p');
+        p.className = clase;
+        p.textContent = texto;
+        jugada.append(p);
+      };
+      linea('jugada__puesto', `${d.puesto} · ${d.area}`);
+      linea('jugada__titulo', d.titulo ?? '');
+      linea('jugada__resumen', d.resumen ?? '');
+      const a = document.createElement('a');
+      a.className = 'jugada__enlace';
+      a.href = d.url ?? '#';
+      a.textContent = 'Ver caso de estudio';
+      jugada.append(a);
+      // Las clases de Astro llevan un atributo de ámbito: lo copiamos a los nodos nuevos.
+      const ambito = Array.from(jugada.attributes).find((at) => at.name.startsWith('data-astro-cid'));
+      if (ambito) jugada.querySelectorAll('*').forEach((n) => n.setAttribute(ambito.name, ''));
+      jugada.classList.remove('cambio');
+      void jugada.offsetWidth;
+      jugada.classList.add('cambio');
+      trazar(boton, animar);
+    }
+
+    botones.forEach((b) => b.addEventListener('click', () => elegir(b)));
+
+    // Flechas del teclado para moverse entre posiciones dentro de la cancha.
+    pizarra.addEventListener('keydown', (e) => {
+      const i = botones.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0) return;
+      const paso = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (!paso) return;
+      e.preventDefault();
+      const siguiente = botones[(i + paso + botones.length) % botones.length]!;
+      siguiente.focus();
+      elegir(siguiente);
+    });
+
+    // Arrastrar al jugador: el pase se recalcula en vivo.
+    jugador.addEventListener('pointerdown', (e) => {
+      jugador.setPointerCapture(e.pointerId);
+      const mover = (ev: PointerEvent) => {
+        const caja = cancha.getBoundingClientRect();
+        yo.x = Math.min(Math.max(((ev.clientX - caja.left) / caja.width) * 100, 8), 92);
+        yo.y = Math.min(Math.max(((ev.clientY - caja.top) / caja.height) * 140, 10), 130);
+        Object.assign(jugador.style, aPorcentaje(yo.x, yo.y));
+        if (actual) trazar(actual, false);
+      };
+      const soltar = () => {
+        jugador.removeEventListener('pointermove', mover);
+        jugador.removeEventListener('pointerup', soltar);
+      };
+      jugador.addEventListener('pointermove', mover);
+      jugador.addEventListener('pointerup', soltar);
+    });
+
+    // «gol»: el balón sale del 10 y entra al arco.
+    document.addEventListener('portafolio:gol', () => {
+      if (reducir.matches) return;
+      const desde = aPorcentaje(yo.x, yo.y);
+      const hasta = aPorcentaje(50, 3);
+      balon
+        .animate(
+          [
+            { left: desde.left, top: desde.top, opacity: 1, transform: 'translate(-50%,-50%) scale(1)' },
+            {
+              left: '58%',
+              top: '30%',
+              opacity: 1,
+              transform: 'translate(-50%,-50%) scale(1.5)',
+              offset: 0.5,
+            },
+            { left: hasta.left, top: hasta.top, opacity: 1, transform: 'translate(-50%,-50%) scale(0.9)' },
+          ],
+          { duration: 700, easing: 'cubic-bezier(.3,.6,.2,1)' },
+        )
+        .finished.then(() => {
+          arco.classList.remove('vibrar');
+          void arco.getBoundingClientRect();
+          arco.classList.add('vibrar');
+        });
+    });
+
+    // Momento de entrada: el primer pase se dibuja cuando la cancha aparece en pantalla.
+    if (actual) {
+      trazar(actual, false);
+      const obs = new IntersectionObserver(
+        (entradas) => {
+          if (entradas.some((en) => en.isIntersecting)) {
+            elegir(actual!, true);
+            obs.disconnect();
+          }
+        },
+        { threshold: 0.5 },
+      );
+      obs.observe(cancha);
+    }
+  });
+</script>

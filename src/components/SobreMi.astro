@@ -1,0 +1,141 @@
+---
+import { Image } from 'astro:assets';
+import foto from '@/assets/fotos/miguel.jpg';
+import { ahoraMismo, historia } from '@/data/perfil';
+---
+
+<section class="seccion" id="sobre-mi" aria-labelledby="sobre-titulo">
+  <div class="contenedor sobre">
+    <h2 id="sobre-titulo" class="titulo-seccion sobre__titulo">
+      Sobre mí
+    </h2>
+
+    <figure class="sobre__foto">
+      <Image
+        src={foto}
+        alt="Miguel Ángel Pantoja, de traje negro y corbata, mirando a la cámara."
+        widths={[240, 326]}
+        sizes="(min-width: 48rem) 16rem, 60vw"
+        loading="lazy"
+      />
+    </figure>
+
+    <div class="sobre__texto">
+      {historia.map((p) => (
+        <p>{p}</p>
+      ))}
+    </div>
+
+    <aside class="ahora" aria-labelledby="ahora-titulo">
+      <h3 id="ahora-titulo" class="ahora__titulo">
+        Ahora mismo
+      </h3>
+      <ul>
+        {ahoraMismo.items.map((i) => (
+          <li>{i}</li>
+        ))}
+      </ul>
+      <p class="ahora__fecha texto-suave">Actualizado: {ahoraMismo.actualizado}</p>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .sobre {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr) minmax(0, 20rem);
+    grid-template-areas:
+      'titulo titulo titulo'
+      'foto texto ahora';
+    gap: var(--e-5) var(--e-7);
+    align-items: start;
+  }
+
+  .sobre__titulo {
+    grid-area: titulo;
+  }
+
+  .sobre__foto {
+    grid-area: foto;
+  }
+
+  /* La foto lleva un bloque azul detrás, corrido, como una camiseta colgada. */
+  .sobre__foto img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--radio-imagen);
+    box-shadow: 12px 12px 0 var(--azul);
+    border-radius: var(--radio-imagen);
+  }
+
+  .sobre__texto {
+    grid-area: texto;
+    display: grid;
+    gap: var(--e-4);
+    max-width: var(--medida);
+    font-size: 1.125rem;
+  }
+
+  .sobre__texto p:first-child {
+    font-size: var(--t-2);
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  /* Lo único "en vivo" del sitio va en verde, igual en Día y en Noche (azul noche sobre verde: 9,3:1). */
+  .ahora {
+    grid-area: ahora;
+    padding: var(--e-5);
+    background: var(--verde-vivo);
+    border-radius: var(--radio-tarjeta);
+    color: var(--azul-noche);
+  }
+
+  .ahora .ahora__fecha {
+    color: var(--azul-noche);
+  }
+
+  .ahora__titulo {
+    font-size: var(--t-2);
+    font-stretch: 110%;
+    font-weight: 750;
+    margin-bottom: var(--e-3);
+  }
+
+  .ahora ul {
+    display: grid;
+    gap: var(--e-2);
+    padding-left: 1.1em;
+  }
+
+  .ahora__fecha {
+    margin-top: var(--e-4);
+    font-size: var(--t-0);
+  }
+
+  @media (max-width: 64rem) {
+    .sobre {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      grid-template-areas:
+        'titulo titulo'
+        'foto texto'
+        'ahora ahora';
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .sobre {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'titulo'
+        'foto'
+        'texto'
+        'ahora';
+    }
+
+    .sobre__foto {
+      max-width: 15rem;
+    }
+  }
+</style>

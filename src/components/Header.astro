@@ -1,0 +1,242 @@
+---
+import SelectorTema from '@/components/SelectorTema.astro';
+import { perfil } from '@/data/perfil';
+
+const enlaces = [
+  { href: '/#proyectos', texto: 'Proyectos' },
+  { href: '/#sobre-mi', texto: 'Sobre mí' },
+  { href: '/#contacto', texto: 'Contacto' },
+  { href: '/cv', texto: 'CV' },
+];
+const ruta = Astro.url.pathname;
+---
+
+<header class="cabecera">
+  <div class="contenedor cabecera__fila">
+    <a class="marca" href="/" aria-current={ruta === '/' ? 'page' : undefined}>
+      {perfil.nombreCorto}
+    </a>
+
+    <button
+      class="menu-boton requiere-js"
+      type="button"
+      aria-expanded="false"
+      aria-controls="menu-principal"
+      data-menu-abrir
+    >
+      Menú
+    </button>
+
+    <div class="menu" id="menu-principal" data-menu>
+      <nav aria-label="Principal">
+        <ul class="menu__lista">
+          {enlaces.map((e) => (
+            <li>
+              <a href={e.href} aria-current={ruta === e.href ? 'page' : undefined}>
+                {e.texto}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <SelectorTema />
+      <button class="menu-cerrar requiere-js" type="button" data-menu-cerrar>
+        Cerrar menú
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .cabecera {
+    position: relative;
+    z-index: var(--z-header);
+    background: var(--fondo);
+  }
+
+  .cabecera__fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--e-5);
+    min-height: 4.5rem;
+  }
+
+  .marca {
+    font-weight: 800;
+    font-stretch: 115%;
+    font-size: 1.125rem;
+    text-decoration: none;
+    padding-block: var(--e-3);
+  }
+
+  .menu {
+    display: flex;
+    align-items: center;
+    gap: var(--e-6);
+  }
+
+  .menu__lista {
+    display: flex;
+    gap: var(--e-1);
+    list-style: none;
+    padding: 0;
+  }
+
+  .menu__lista a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: var(--e-3);
+    font-weight: 550;
+    text-decoration: none;
+  }
+
+  .menu__lista a:hover,
+  .menu__lista a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  .menu-boton,
+  .menu-cerrar {
+    display: none;
+  }
+
+  /* Móvil: el menú es un panel a pantalla completa con el foco atrapado (ver script). */
+  @media (max-width: 47.99rem) {
+    html.js .menu-boton {
+      display: inline-flex;
+    }
+
+    html.js .menu {
+      position: fixed;
+      inset: 0;
+      z-index: var(--z-menu);
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: var(--e-7);
+      padding: var(--e-8) var(--margen);
+      background: var(--fondo);
+      visibility: hidden;
+      opacity: 0;
+      transition:
+        opacity var(--dur-media) var(--curva),
+        visibility 0s linear var(--dur-media);
+    }
+
+    html.js .menu[data-abierto] {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity var(--dur-media) var(--curva);
+    }
+
+    html.js .menu__lista {
+      flex-direction: column;
+      gap: var(--e-2);
+    }
+
+    html.js .menu__lista a {
+      font-size: var(--t-4);
+      font-weight: 800;
+      font-stretch: 115%;
+      padding-inline: 0;
+    }
+
+    html.js .menu-cerrar {
+      display: inline-flex;
+      position: absolute;
+      top: var(--e-4);
+      right: var(--margen);
+    }
+
+    /* Sin JS: los enlaces se envuelven en varias líneas. */
+    html:not(.js) .cabecera__fila {
+      flex-wrap: wrap;
+    }
+
+    html:not(.js) .menu {
+      flex-wrap: wrap;
+      gap: var(--e-3);
+    }
+  }
+
+  .menu-boton,
+  .menu-cerrar {
+    align-items: center;
+    min-height: 2.75rem;
+    padding: var(--e-2) var(--e-4);
+    border: var(--trazo) solid var(--tinta);
+    border-radius: var(--radio-boton);
+    background: transparent;
+    font-weight: 650;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const abrir = document.querySelector<HTMLButtonElement>('[data-menu-abrir]');
+  const cerrar = document.querySelector<HTMLButtonElement>('[data-menu-cerrar]');
+  const movil = window.matchMedia('(max-width: 47.99rem)');
+
+  if (menu && abrir && cerrar) {
+    const enfocables = () =>
+      Array.from(menu.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')).filter(
+        (el) => el.offsetParent !== null,
+      );
+
+    const alTeclear = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        cerrarMenu();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const lista = enfocables();
+      const primero = lista[0];
+      const ultimo = lista[lista.length - 1];
+      if (!primero || !ultimo) return;
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault();
+        primero.focus();
+      }
+    };
+
+    function abrirMenu() {
+      menu!.setAttribute('data-abierto', '');
+      menu!.setAttribute('role', 'dialog');
+      menu!.setAttribute('aria-modal', 'true');
+      menu!.setAttribute('aria-label', 'Menú');
+      abrir!.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', alTeclear);
+      enfocables()[0]?.focus();
+    }
+
+    function cerrarMenu({ devolverFoco = true } = {}) {
+      if (!menu!.hasAttribute('data-abierto')) return;
+      menu!.removeAttribute('data-abierto');
+      menu!.removeAttribute('role');
+      menu!.removeAttribute('aria-modal');
+      menu!.removeAttribute('aria-label');
+      abrir!.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', alTeclear);
+      if (devolverFoco) abrir!.focus();
+    }
+
+    abrir.addEventListener('click', abrirMenu);
+    cerrar.addEventListener('click', () => cerrarMenu());
+    // Al elegir un enlace, se cierra y el navegador lleva el foco al destino.
+    menu
+      .querySelectorAll('a')
+      .forEach((a) => a.addEventListener('click', () => cerrarMenu({ devolverFoco: false })));
+    movil.addEventListener('change', (e) => {
+      if (!e.matches) cerrarMenu({ devolverFoco: false });
+    });
+  }
+</script>

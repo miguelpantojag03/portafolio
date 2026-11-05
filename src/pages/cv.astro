@@ -1,0 +1,211 @@
+---
+import Base from '@/layouts/Base.astro';
+import { perfil, tecnologias, trayectoria } from '@/data/perfil';
+import { obtenerProyectos } from '@/lib/proyectos';
+
+const proyectos = await obtenerProyectos();
+---
+
+<Base titulo="CV" descripcion={`CV de ${perfil.nombre}: formación, proyectos y tecnologías.`}>
+  <div class="contenedor cv">
+    <div class="cv__acciones requiere-js">
+      <button class="boton boton--principal" type="button" data-imprimir>
+        Guardar como PDF
+      </button>
+      <p class="texto-suave">En la ventana de impresión, elige «Guardar como PDF».</p>
+    </div>
+
+    <header class="cv__cabecera">
+      <h1 class="cv__nombre">{perfil.nombre}</h1>
+      <p class="cv__rol">
+        {perfil.rol}, {perfil.semestre}. {perfil.ciudad}.
+      </p>
+      <ul class="cv__contacto" role="list">
+        <li>
+          <a href={`mailto:${perfil.email}`}>{perfil.email}</a>
+        </li>
+        <li>
+          <a href={perfil.github}>{perfil.github.replace('https://', '')}</a>
+        </li>
+        <li>
+          <a href={perfil.linkedin}>LinkedIn: miguel-ángel-pantoja-guerra</a>
+        </li>
+      </ul>
+    </header>
+
+    <section class="cv__bloque" aria-labelledby="cv-perfil">
+      <h2 id="cv-perfil">Perfil</h2>
+      <p>
+        {perfil.queHago} He construido una app para reloj y teléfono con sincronización en la nube, una API
+        REST con Spring Boot y su app web, una app móvil con IA y un videojuego en Unity.{' '}
+        {perfil.disponibilidad}
+      </p>
+    </section>
+
+    <section class="cv__bloque" aria-labelledby="cv-formacion">
+      <h2 id="cv-formacion">Formación</h2>
+      <p>
+        <strong>Ingeniería de Software</strong>, {perfil.universidad}. Cursando {perfil.semestre}; grado
+        estimado en
+        {perfil.grado}.
+      </p>
+    </section>
+
+    <section class="cv__bloque" aria-labelledby="cv-proyectos">
+      <h2 id="cv-proyectos">Proyectos</h2>
+      <ul class="cv__lista" role="list">
+        {proyectos.map((p) => (
+          <li>
+            <h3>
+              {p.data.titulo} <span class="texto-suave">· {p.data.fecha}</span>
+            </h3>
+            <p>{p.data.resumen}</p>
+            <p class="texto-suave">{p.data.stack.join(', ')}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="cv__bloque" aria-labelledby="cv-tecnologias">
+      <h2 id="cv-tecnologias">Tecnologías</h2>
+      <p>
+        <strong>En proyectos:</strong> {tecnologias.enProyectos.map((t) => t.nombre).join(', ')}.
+      </p>
+      <p>
+        <strong>También he usado:</strong> {tecnologias.fueraDeProyectos.map((t) => t.nombre).join(', ')}.
+      </p>
+    </section>
+
+    <section class="cv__bloque" aria-labelledby="cv-trayectoria">
+      <h2 id="cv-trayectoria">Trayectoria</h2>
+      <ul class="cv__lista" role="list">
+        {trayectoria.map((t) => (
+          <li>
+            <p>
+              <strong>{t.fecha}:</strong> {t.titulo}. {t.detalle}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .cv {
+    max-width: 52rem;
+    padding-block: var(--e-7) var(--e-9);
+  }
+
+  .cv__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--e-3) var(--e-5);
+    margin-bottom: var(--e-7);
+  }
+
+  .cv__nombre {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .cv__rol {
+    margin-top: var(--e-3);
+    font-size: var(--t-2);
+    font-weight: 500;
+  }
+
+  .cv__contacto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-1) var(--e-5);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--e-4);
+  }
+
+  .cv__contacto a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .cv__bloque {
+    padding-top: var(--e-6);
+    margin-top: var(--e-6);
+    border-top: var(--trazo) solid var(--tinta);
+  }
+
+  .cv__bloque h2 {
+    font-size: var(--t-2);
+    font-stretch: 115%;
+    font-weight: 800;
+    margin-bottom: var(--e-3);
+  }
+
+  .cv__bloque p + p {
+    margin-top: var(--e-2);
+  }
+
+  .cv__lista {
+    display: grid;
+    gap: var(--e-4);
+    list-style: none;
+    padding: 0;
+  }
+
+  .cv__lista h3 {
+    font-size: 1.0625rem;
+    font-weight: 750;
+  }
+
+  /* Impresión: solo el CV, en blanco y negro, sin navegación. */
+  @media print {
+    :global(header.cabecera),
+    :global(footer.pie),
+    :global(.saltar),
+    :global(.aviso),
+    .cv__acciones {
+      display: none !important;
+    }
+
+    :global(html),
+    :global(body) {
+      background: #fff !important;
+      color: #000 !important;
+      font-size: 10.5pt;
+    }
+
+    .cv {
+      max-width: none;
+      padding: 0;
+    }
+
+    .cv__bloque {
+      break-inside: avoid;
+      border-top-color: #000;
+      margin-top: 12pt;
+      padding-top: 10pt;
+    }
+
+    .texto-suave {
+      color: #333 !important;
+    }
+
+    a {
+      text-decoration: none;
+    }
+  }
+
+  @page {
+    margin: 16mm;
+  }
+</style>
+
+<script>
+  document.querySelector('[data-imprimir]')?.addEventListener('click', () => window.print());
+</script>

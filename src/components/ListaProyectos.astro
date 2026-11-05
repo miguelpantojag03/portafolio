@@ -1,0 +1,337 @@
+---
+import { Image } from 'astro:assets';
+import { obtenerProyectos } from '@/lib/proyectos';
+import { tecnologias } from '@/data/perfil';
+
+const proyectos = await obtenerProyectos();
+
+// Filtro: solo tecnologías que aparecen en algún proyecto destacado.
+const filtros = tecnologias.enProyectos.filter((t) =>
+  t.proyectos?.some((slug) => proyectos.some((p) => p.id === slug)),
+);
+const tecnologiasDe = (slug: string) =>
+  filtros.filter((t) => t.proyectos?.includes(slug)).map((t) => t.nombre);
+---
+
+<section class="seccion" id="proyectos" aria-labelledby="proyectos-titulo">
+  <div class="contenedor">
+    <div class="cabeza">
+      <h2 id="proyectos-titulo" class="titulo-seccion">
+        Proyectos
+      </h2>
+      <div class="filtro requiere-js" role="group" aria-label="Filtrar proyectos por tecnología" data-filtro>
+        <button type="button" class="chip" aria-pressed="true" data-tec="">
+          Todas
+        </button>
+        {filtros.map((t) => (
+          <button type="button" class="chip" aria-pressed="false" data-tec={t.nombre}>
+            {t.nombre}
+          </button>
+        ))}
+      </div>
+      <p class="filtro__estado" role="status" data-filtro-estado></p>
+    </div>
+
+    <ul class="proyectos" role="list">
+      {proyectos.map((p) => (
+        <li class="proyecto" data-proyecto data-tecnologias={JSON.stringify(tecnologiasDe(p.id))}>
+          <div class="proyecto__texto">
+            <h3 class="proyecto__nombre">
+              <a href={`/proyectos/${p.id}`} class="proyecto__enlace">
+                {p.data.titulo}
+              </a>
+            </h3>
+            <p class="proyecto__resumen">{p.data.resumen}</p>
+            <ul class="proyecto__stack" role="list" aria-label="Tecnologías">
+              {p.data.stack.slice(0, 5).map((s) => (
+                <li>{s}</li>
+              ))}
+            </ul>
+            <span class="proyecto__ver" aria-hidden="true">
+              Ver caso de estudio
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <path d="M3 9h11M10 4l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" />
+              </svg>
+            </span>
+          </div>
+          <div class="proyecto__lado">
+            <p class="proyecto__area">{p.data.area}</p>
+            {p.data.portada && (
+              <Image
+                class="proyecto__imagen"
+                src={p.data.portada.src}
+                alt=""
+                widths={[320, 480, 720]}
+                sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 40vw, 90vw"
+                loading="lazy"
+              />
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cabeza {
+    display: grid;
+    gap: var(--e-4);
+    margin-bottom: var(--e-6);
+  }
+
+  .cabeza .titulo-seccion {
+    margin-bottom: 0;
+  }
+
+  .filtro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+  }
+
+  .chip {
+    min-height: 2.75rem;
+    padding: var(--e-2) var(--e-4);
+    border: var(--trazo) solid color-mix(in srgb, var(--tinta) 25%, transparent);
+    border-radius: var(--radio-boton);
+    background: transparent;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-corta) var(--curva),
+      border-color var(--dur-corta) var(--curva),
+      transform var(--dur-corta) var(--curva);
+  }
+
+  .chip:hover {
+    border-color: var(--accion);
+  }
+
+  .chip:active {
+    transform: scale(0.96);
+  }
+
+  .chip[aria-pressed='true'] {
+    background: var(--accion);
+    border-color: var(--accion);
+    color: var(--sobre-accion);
+  }
+
+  .filtro__estado {
+    min-height: 1.6em;
+    color: var(--tinta-suave);
+    font-weight: 600;
+  }
+
+  .proyectos {
+    display: grid;
+    gap: var(--e-5);
+    list-style: none;
+    padding: 0;
+  }
+
+  .proyecto {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--e-6);
+    padding: var(--e-6) var(--e-7);
+    border-radius: var(--radio-tarjeta);
+    background: var(--superficie);
+    overflow: hidden;
+    transition:
+      opacity var(--dur-media) var(--curva),
+      transform var(--dur-media) var(--curva),
+      filter var(--dur-media) var(--curva);
+  }
+
+  /* Barrido azul desde la izquierda al pasar el puntero o al enfocar. */
+  .proyecto::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(100deg, var(--azul), color-mix(in srgb, var(--azul) 70%, var(--cancha)));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 450ms var(--curva);
+  }
+
+  .proyecto:hover::before,
+  .proyecto:focus-within::before {
+    transform: scaleX(1);
+  }
+
+  .proyecto:hover,
+  .proyecto:focus-within {
+    color: var(--hielo);
+  }
+
+  .proyecto:hover .proyecto__stack li,
+  .proyecto:focus-within .proyecto__stack li {
+    background: color-mix(in srgb, var(--hielo) 18%, transparent);
+    color: var(--hielo);
+  }
+
+  .proyecto:hover .proyecto__area,
+  .proyecto:focus-within .proyecto__area {
+    background: var(--verde-vivo);
+    color: var(--azul-noche);
+  }
+
+  .proyecto.atenuado {
+    opacity: 0.35;
+    filter: saturate(0.4);
+    transform: scale(0.985);
+  }
+
+  .proyecto__nombre {
+    font-size: var(--t-5);
+    font-stretch: 125%;
+    font-weight: 850;
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+
+  .proyecto__enlace {
+    text-decoration: none;
+  }
+
+  .proyecto__enlace::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .proyecto__enlace:focus-visible {
+    outline: none;
+  }
+
+  .proyecto:has(.proyecto__enlace:focus-visible) {
+    outline: 3px solid var(--resalte);
+    outline-offset: 4px;
+  }
+
+  .proyecto__resumen {
+    margin-top: var(--e-4);
+    font-size: var(--t-2);
+    line-height: 1.35;
+    font-weight: 500;
+    max-width: 44ch;
+  }
+
+  .proyecto__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--e-4);
+  }
+
+  .proyecto__stack li {
+    padding: 2px 10px;
+    border-radius: var(--radio-boton);
+    background: var(--fondo);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition:
+      background-color var(--dur-media) var(--curva),
+      color var(--dur-media) var(--curva);
+  }
+
+  .proyecto__ver {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--e-2);
+    margin-top: var(--e-5);
+    font-weight: 700;
+  }
+
+  .proyecto__ver svg {
+    transition: transform var(--dur-media) var(--curva-rebote);
+  }
+
+  .proyecto:hover .proyecto__ver svg {
+    transform: translateX(6px);
+  }
+
+  .proyecto__lado {
+    display: grid;
+    justify-items: end;
+    gap: var(--e-4);
+  }
+
+  .proyecto__area {
+    padding: var(--e-1) var(--e-4);
+    border-radius: var(--radio-boton);
+    background: var(--fondo);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    transition:
+      background-color var(--dur-media) var(--curva),
+      color var(--dur-media) var(--curva);
+  }
+
+  .proyecto__imagen {
+    width: 20rem;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: var(--radio-imagen);
+    background: var(--marino);
+    transform: rotate(2deg);
+    transition: transform 500ms var(--curva-rebote);
+  }
+
+  .proyecto:hover .proyecto__imagen {
+    transform: rotate(-1.5deg) scale(1.04);
+  }
+
+  @media (max-width: 47.99rem) {
+    .proyecto {
+      grid-template-columns: 1fr;
+      padding: var(--e-5);
+    }
+
+    .proyecto__lado {
+      order: -1;
+      justify-items: start;
+    }
+
+    .proyecto__imagen {
+      width: 100%;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const filtro = document.querySelector<HTMLElement>('[data-filtro]');
+  const estado = document.querySelector<HTMLElement>('[data-filtro-estado]');
+  const filas = Array.from(document.querySelectorAll<HTMLElement>('[data-proyecto]'));
+
+  filtro?.addEventListener('click', (e) => {
+    const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-tec]');
+    if (!chip) return;
+    const tec = chip.dataset.tec ?? '';
+    filtro.querySelectorAll('[data-tec]').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+
+    let cuantos = 0;
+    filas.forEach((fila) => {
+      const usa = !tec || (JSON.parse(fila.dataset.tecnologias ?? '[]') as string[]).includes(tec);
+      fila.classList.toggle('atenuado', !usa);
+      if (usa) cuantos++;
+    });
+
+    if (estado) {
+      estado.textContent = tec
+        ? `${cuantos} ${cuantos === 1 ? 'proyecto usa' : 'proyectos usan'} ${tec}.`
+        : '';
+    }
+  });
+</script>

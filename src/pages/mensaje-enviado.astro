@@ -1,0 +1,60 @@
+---
+import Base from '@/layouts/Base.astro';
+import { perfil } from '@/data/perfil';
+
+// Página de resultado del formulario cuando el navegador no tiene JavaScript.
+export const prerender = false;
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<Base titulo={error ? 'No se pudo enviar el mensaje' : 'Mensaje enviado'} noIndexar>
+  <section class="contenedor resultado">
+    {error ? (
+      <>
+        <h1 class="resultado__titulo">No se pudo enviar el mensaje</h1>
+        <p class="entradilla">{error}</p>
+        <div class="resultado__acciones">
+          <a class="boton boton--principal" href="/#contacto">
+            Volver al formulario
+          </a>
+          <a class="boton" href={`mailto:${perfil.email}`}>
+            Escribir a {perfil.email}
+          </a>
+        </div>
+      </>
+    ) : (
+      <>
+        <h1 class="resultado__titulo">Mensaje enviado</h1>
+        <p class="entradilla">Gracias. Te respondo al email que escribiste.</p>
+        <div class="resultado__acciones">
+          <a class="boton boton--principal" href="/#proyectos">
+            Ver proyectos
+          </a>
+        </div>
+      </>
+    )}
+  </section>
+</Base>
+
+<style>
+  .resultado {
+    display: grid;
+    gap: var(--e-5);
+    padding-block: var(--e-9) var(--e-10);
+  }
+
+  .resultado__titulo {
+    font-size: var(--t-5);
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+
+  .resultado__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-3);
+  }
+</style>

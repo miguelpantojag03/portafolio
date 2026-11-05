@@ -1,0 +1,85 @@
+---
+/** Selector de tema: Día (azul hielo) y Noche (azul noche). */
+---
+
+<div class="tema requiere-js" role="group" aria-labelledby="tema-etiqueta">
+  <span id="tema-etiqueta" class="solo-lectores">
+    Tema de color
+  </span>
+  <button type="button" class="tema__opcion" data-tema-opcion="dia" aria-pressed="false">
+    Día
+  </button>
+  <button type="button" class="tema__opcion" data-tema-opcion="noche" aria-pressed="false">
+    Noche
+  </button>
+</div>
+
+<style>
+  .tema {
+    display: inline-flex;
+    padding: 3px;
+    border: var(--trazo) solid var(--tinta);
+    border-radius: var(--radio-boton);
+  }
+
+  .tema__opcion {
+    min-height: 2.5rem;
+    min-width: 2.75rem;
+    padding: var(--e-1) var(--e-4);
+    border: 0;
+    border-radius: var(--radio-boton);
+    background: transparent;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-corta) var(--curva),
+      color var(--dur-corta) var(--curva);
+  }
+
+  .tema__opcion[aria-pressed='true'] {
+    background: var(--tinta);
+    color: var(--fondo);
+  }
+
+  .tema__opcion:not([aria-pressed='true']):hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+  }
+</style>
+
+<script>
+  type Tema = 'dia' | 'noche';
+  const raiz = document.documentElement;
+  const oscuroSistema = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const temaActual = (): Tema =>
+    (raiz.dataset.tema as Tema | undefined) ?? (oscuroSistema.matches ? 'noche' : 'dia');
+
+  function pintarBotones() {
+    const actual = temaActual();
+    document.querySelectorAll<HTMLButtonElement>('[data-tema-opcion]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b.dataset.temaOpcion === actual));
+    });
+    document
+      .querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
+      .forEach((m) => m.setAttribute('content', actual === 'noche' ? '#081634' : '#e6eeff'));
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-tema-opcion]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      const tema = boton.dataset.temaOpcion as Tema;
+      raiz.dataset.tema = tema;
+      try {
+        localStorage.setItem('tema', tema);
+      } catch {
+        // Sin almacenamiento (modo privado estricto): el tema dura lo que dure la página.
+      }
+      pintarBotones();
+    });
+  });
+
+  oscuroSistema.addEventListener('change', pintarBotones);
+  pintarBotones();
+</script>

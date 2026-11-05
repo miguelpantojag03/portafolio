@@ -1,0 +1,49 @@
+---
+import Base from '@/layouts/Base.astro';
+import Hero from '@/components/Hero.astro';
+import ListaProyectos from '@/components/ListaProyectos.astro';
+import ComoTrabajo from '@/components/ComoTrabajo.astro';
+import SobreMi from '@/components/SobreMi.astro';
+import Trayectoria from '@/components/Trayectoria.astro';
+import Contacto from '@/components/Contacto.astro';
+import { perfil } from '@/data/perfil';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: perfil.nombre,
+  jobTitle: perfil.rol,
+  email: `mailto:${perfil.email}`,
+  url: Astro.site?.href,
+  image: new URL('/og.png', Astro.site).href,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Pasto',
+    addressRegion: 'Nariño',
+    addressCountry: 'CO',
+  },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: perfil.universidad },
+  sameAs: [perfil.github, perfil.linkedin],
+  knowsAbout: [
+    'Java',
+    'Spring Boot',
+    'Kotlin',
+    'Wear OS',
+    'React',
+    'React Native',
+    'TypeScript',
+    'PostgreSQL',
+    'Supabase',
+    'Unity',
+  ],
+};
+---
+
+<Base jsonLd={jsonLd}>
+  <Hero />
+  <ListaProyectos />
+  <ComoTrabajo />
+  <SobreMi />
+  <Trayectoria />
+  <Contacto />
+</Base>

@@ -1,0 +1,122 @@
+/*
+ * Tokens de diseño: Cancha.
+ * Azul cobalto como color principal y verde cancha como segundo color. Sin blanco ni negro puros.
+ * Fuente única de verdad para color, tipografía, espaciado y movimiento.
+ * Justificación de cada valor: docs/design-plan.md
+ */
+
+:root {
+  /* Paleta base (en componentes, usar los roles de abajo) */
+  --azul: #1d3fe0;
+  --azul-claro: #7c9bff;
+  --azul-noche: #081634;
+  --marino: #0a1f44;
+  --hielo: #e6eeff;
+  --hielo-2: #c9daff;
+  --verde: #047a4a;
+  --verde-vivo: #34d399;
+  --cancha: #0b7a4b;
+  --cancha-2: #0a6e44;
+  --cal: #d4fbe8;
+
+  /* Roles: Día (claro) */
+  --fondo: var(--hielo);
+  --superficie: var(--hielo-2);
+  --tinta: var(--marino);
+  --tinta-suave: #34507f;
+  --accion: var(--azul);
+  --sobre-accion: var(--hielo);
+  --resalte: var(--verde);
+  --exito: var(--verde);
+  --error: #b3261e;
+  color-scheme: light;
+
+  /* Tipografía */
+  --familia: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+  --t-cartel: clamp(3.25rem, 7.4vw, 8.5rem);
+  --t-5: clamp(2.25rem, 6vw, 5.4rem);
+  --t-4: clamp(2rem, 4vw, 2.5rem);
+  --t-3: clamp(1.5rem, 3vw, 1.875rem);
+  --t-2: 1.375rem;
+  --t-1: 1.0625rem;
+  --t-0: 0.8125rem;
+  --medida: 64ch;
+
+  /* Espaciado, base 4 px */
+  --e-1: 0.25rem;
+  --e-2: 0.5rem;
+  --e-3: 0.75rem;
+  --e-4: 1rem;
+  --e-5: 1.5rem;
+  --e-6: 2rem;
+  --e-7: 3rem;
+  --e-8: 4rem;
+  --e-9: 6rem;
+  --e-10: 9rem;
+  --margen: clamp(1rem, 5vw, 5rem);
+  --ancho-max: 85rem;
+  --entre-secciones: var(--e-9);
+
+  /* Forma: según jerarquía */
+  --radio-boton: 999px;
+  --radio-tarjeta: 20px;
+  --radio-imagen: 10px;
+  --trazo: 2px;
+
+  /* Movimiento */
+  --dur-corta: 160ms;
+  --dur-media: 320ms;
+  --dur-larga: 900ms;
+  --curva: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --curva-rebote: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Capas */
+  --z-header: 10;
+  --z-menu: 20;
+  --z-aviso: 30;
+}
+
+/* Noche (oscuro): paleta propia. La acción pasa a azul claro; el verde queda para la cancha y los resaltes. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='dia']) {
+    --fondo: var(--azul-noche);
+    --superficie: #10265a;
+    --tinta: var(--hielo);
+    --tinta-suave: #9fb4e0;
+    --accion: var(--azul-claro);
+    --sobre-accion: var(--azul-noche);
+    --resalte: var(--verde-vivo);
+    --exito: var(--verde-vivo);
+    --error: #ff8a80;
+    color-scheme: dark;
+  }
+}
+
+:root[data-tema='noche'] {
+  --fondo: var(--azul-noche);
+  --superficie: #10265a;
+  --tinta: var(--hielo);
+  --tinta-suave: #9fb4e0;
+  --accion: var(--azul-claro);
+  --sobre-accion: var(--azul-noche);
+  --resalte: var(--verde-vivo);
+  --exito: var(--verde-vivo);
+  --error: #ff8a80;
+  color-scheme: dark;
+}
+
+@media (max-width: 40rem) {
+  :root {
+    --t-cartel: clamp(2.6rem, 13.5vw, 4.5rem);
+    --entre-secciones: var(--e-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-corta: 0ms;
+    --dur-media: 0ms;
+    --dur-larga: 0ms;
+  }
+}

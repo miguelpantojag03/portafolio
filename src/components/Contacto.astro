@@ -1,0 +1,463 @@
+---
+import { perfil } from '@/data/perfil';
+import { LIMITES } from '@/lib/contacto';
+
+// Íconos: marcas de GitHub y LinkedIn (perfiles propios) y una hoja para el CV.
+const enlaces = [
+  {
+    nombre: 'GitHub',
+    detalle: 'El código de mis proyectos',
+    url: perfil.github,
+    externo: true,
+    // Sigue al tema: marino en Día, claro en Noche.
+    color: '--tinta',
+    colorIcono: '--fondo',
+    icono:
+      'M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z',
+  },
+  {
+    nombre: 'LinkedIn',
+    detalle: 'Mi perfil profesional',
+    url: perfil.linkedin,
+    externo: true,
+    color: '--azul',
+    icono:
+      'M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z',
+  },
+  {
+    nombre: 'Ver mi CV',
+    detalle: 'Listo para imprimir o guardar en PDF',
+    url: '/cv',
+    externo: false,
+    color: '--cancha',
+    icono:
+      'M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.5V9h5.5L13 3.5ZM8 13v1.8h8V13H8Zm0 3.6v1.8h5.5v-1.8H8Z',
+  },
+];
+---
+
+<section class="seccion" id="contacto" aria-labelledby="contacto-titulo">
+  <div class="contenedor contacto">
+    <div class="contacto__directo">
+      <h2 id="contacto-titulo" class="titulo-seccion">
+        Contacto
+      </h2>
+      <p class="entradilla">¿Tienes un proyecto o una vacante? Escríbeme.</p>
+
+      <div class="email">
+        <a class="email__direccion" href={`mailto:${perfil.email}`}>
+          {perfil.email}
+        </a>
+        <button class="boton requiere-js" type="button" data-copiar={perfil.email}>
+          Copiar email
+        </button>
+      </div>
+
+      <ul class="redes" role="list">
+        {enlaces.map((e) => (
+          <li>
+            <a
+              class="red"
+              href={e.url}
+              style={`--color-red: var(${e.color}); --color-icono: var(${e.colorIcono ?? '--hielo'})`}
+              {...(e.externo ? { target: '_blank', rel: 'me noopener' } : {})}
+            >
+              <span class="red__icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path d={e.icono} fill="currentColor" />
+                </svg>
+              </span>
+              <span class="red__texto">
+                <span class="red__nombre">{e.nombre}</span>
+                <span class="red__detalle">{e.detalle}</span>
+              </span>
+              <svg class="red__flecha" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16">
+                <path
+                  d={e.externo ? 'M5 3h8v8M13 3 3 13' : 'M2 8h11M9 4l4 4-4 4'}
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+              </svg>
+              {e.externo && <span class="solo-lectores"> (se abre en otra pestaña)</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <form class="formulario" method="post" action="/api/contacto" data-formulario>
+      <h3 class="formulario__titulo">O déjame un mensaje aquí</h3>
+
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          autocomplete="name"
+          required
+          maxlength={LIMITES.nombre}
+          aria-describedby="nombre-error"
+        />
+        <p class="campo__error" id="nombre-error" data-error-de="nombre"></p>
+      </div>
+
+      <div class="campo">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          required
+          maxlength={LIMITES.email}
+          aria-describedby="email-error"
+        />
+        <p class="campo__error" id="email-error" data-error-de="email"></p>
+      </div>
+
+      <div class="campo">
+        <label for="mensaje">Mensaje</label>
+        <textarea
+          id="mensaje"
+          name="mensaje"
+          rows="6"
+          required
+          minlength={LIMITES.mensajeMin}
+          maxlength={LIMITES.mensajeMax}
+          aria-describedby="mensaje-ayuda mensaje-error"
+        ></textarea>
+        <p class="campo__ayuda texto-suave" id="mensaje-ayuda">
+          Qué necesitas y para cuándo, si ya lo sabes.
+        </p>
+        <p class="campo__error" id="mensaje-error" data-error-de="mensaje"></p>
+      </div>
+
+      <!-- Anti-spam: un campo que las personas no ven y los bots llenan. -->
+      <div class="trampa" aria-hidden="true">
+        <label for="sitio_web">No llenes este campo</label>
+        <input id="sitio_web" name="sitio_web" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="inicio" value="" data-inicio />
+
+      <button class="boton boton--principal formulario__enviar" type="submit" data-enviar>
+        Enviar mensaje
+      </button>
+      <p class="formulario__estado" role="status" aria-live="polite" data-estado></p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .contacto {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--e-8);
+    align-items: start;
+  }
+
+  .email {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--e-3) var(--e-5);
+    margin-top: var(--e-6);
+  }
+
+  .email__direccion {
+    font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+    font-stretch: 105%;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+  }
+
+  .redes {
+    display: grid;
+    gap: var(--e-3);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--e-6);
+  }
+
+  /* Cada enlace es una tarjeta: ícono de color, nombre, para qué sirve y la dirección del enlace. */
+  .red {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--e-4);
+    min-height: 4.5rem;
+    padding: var(--e-3) var(--e-5) var(--e-3) var(--e-3);
+    border: var(--trazo) solid transparent;
+    border-radius: var(--radio-tarjeta);
+    background: var(--superficie);
+    text-decoration: none;
+    transition:
+      transform var(--dur-media) var(--curva-rebote),
+      border-color var(--dur-corta) var(--curva),
+      box-shadow var(--dur-media) var(--curva);
+  }
+
+  .red:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-red);
+    box-shadow: 0 14px 28px -16px var(--color-red);
+  }
+
+  .red:active {
+    transform: translateY(0) scale(0.99);
+  }
+
+  .red__icono {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    background: var(--color-red);
+    color: var(--color-icono);
+    transition: transform var(--dur-media) var(--curva-rebote);
+  }
+
+  .red:hover .red__icono {
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .red__texto {
+    display: grid;
+    gap: 2px;
+  }
+
+  .red__nombre {
+    font-weight: 750;
+    font-stretch: 110%;
+    font-size: 1.0625rem;
+  }
+
+  .red__detalle {
+    color: var(--tinta-suave);
+    font-size: 0.875rem;
+    overflow-wrap: anywhere;
+  }
+
+  .red__flecha {
+    color: var(--tinta-suave);
+    transition:
+      transform var(--dur-media) var(--curva-rebote),
+      color var(--dur-corta) var(--curva);
+  }
+
+  .red:hover .red__flecha {
+    color: var(--tinta);
+    transform: translate(3px, -3px);
+  }
+
+  .formulario {
+    display: grid;
+    gap: var(--e-5);
+    padding: var(--e-6);
+    border-radius: var(--radio-tarjeta);
+    background: var(--superficie);
+  }
+
+  .formulario__titulo {
+    font-size: var(--t-2);
+    font-stretch: 110%;
+    font-weight: 750;
+  }
+
+  .campo {
+    display: grid;
+    gap: var(--e-2);
+  }
+
+  .campo label {
+    font-weight: 650;
+  }
+
+  .campo input,
+  .campo textarea {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: var(--e-3) var(--e-4);
+    border: var(--trazo) solid var(--tinta);
+    border-radius: var(--radio-imagen);
+    background: var(--fondo);
+    line-height: 1.5;
+  }
+
+  .campo textarea {
+    resize: vertical;
+  }
+
+  .campo input:focus-visible,
+  .campo textarea:focus-visible {
+    outline-offset: 1px;
+  }
+
+  .campo [aria-invalid='true'] {
+    border-color: var(--error);
+    border-width: 3px;
+  }
+
+  .campo__ayuda {
+    font-size: 0.9375rem;
+  }
+
+  .campo__error {
+    color: var(--error);
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .campo__error:empty {
+    display: none;
+  }
+
+  .trampa {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .formulario__enviar {
+    justify-self: start;
+  }
+
+  .formulario__estado {
+    font-weight: 650;
+  }
+
+  .formulario__estado:empty {
+    display: none;
+  }
+
+  .formulario__estado[data-tipo='exito'] {
+    color: var(--exito);
+  }
+
+  .formulario__estado[data-tipo='error'] {
+    color: var(--error);
+  }
+
+  @media (max-width: 55rem) {
+    .contacto {
+      grid-template-columns: 1fr;
+      gap: var(--e-7);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .formulario {
+      padding: var(--e-5) var(--e-4);
+    }
+  }
+</style>
+
+<script>
+  import { validarCampo, validarContacto, type Campo, type RespuestaContacto } from '@/lib/contacto';
+  import { mostrarAviso } from '@/scripts/aviso';
+
+  // Copiar email
+  document.querySelectorAll<HTMLButtonElement>('[data-copiar]').forEach((boton) => {
+    boton.addEventListener('click', async () => {
+      const email = boton.dataset.copiar ?? '';
+      try {
+        await navigator.clipboard.writeText(email);
+        mostrarAviso('Email copiado', 'exito');
+      } catch {
+        mostrarAviso(`No se pudo copiar. Selecciona el email: ${email}`, 'error');
+      }
+    });
+  });
+
+  // Formulario
+  const form = document.querySelector<HTMLFormElement>('[data-formulario]');
+  if (form) {
+    const campos: Campo[] = ['nombre', 'email', 'mensaje'];
+    const estado = form.querySelector<HTMLElement>('[data-estado]')!;
+    const enviar = form.querySelector<HTMLButtonElement>('[data-enviar]')!;
+    const inicio = form.querySelector<HTMLInputElement>('[data-inicio]')!;
+    const tocados = new Set<Campo>();
+
+    // Con JS validamos nosotros, con mensajes en español claros; sin JS queda la validación del navegador.
+    form.noValidate = true;
+    inicio.value = String(Date.now());
+
+    const control = (c: Campo) => form.elements.namedItem(c) as HTMLInputElement | HTMLTextAreaElement;
+    const errorDe = (c: Campo) => form.querySelector<HTMLElement>(`[data-error-de="${c}"]`)!;
+
+    function pintarError(c: Campo, mensaje: string | undefined) {
+      control(c).setAttribute('aria-invalid', mensaje ? 'true' : 'false');
+      errorDe(c).textContent = mensaje ?? '';
+    }
+
+    function setEstado(texto: string, tipo?: 'exito' | 'error') {
+      estado.textContent = texto;
+      if (tipo) estado.dataset.tipo = tipo;
+      else delete estado.dataset.tipo;
+    }
+
+    campos.forEach((c) => {
+      const el = control(c);
+      el.addEventListener('blur', () => {
+        if (!el.value.trim() && !tocados.has(c)) return;
+        tocados.add(c);
+        pintarError(c, validarCampo(c, el.value));
+      });
+      el.addEventListener('input', () => {
+        if (tocados.has(c)) pintarError(c, validarCampo(c, el.value));
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const datos = Object.fromEntries(campos.map((c) => [c, control(c).value])) as Record<Campo, string>;
+      const errores = validarContacto(datos);
+      campos.forEach((c) => {
+        tocados.add(c);
+        pintarError(c, errores[c]);
+      });
+      const primero = campos.find((c) => errores[c]);
+      if (primero) {
+        setEstado('Revisa los campos marcados.', 'error');
+        control(primero).focus();
+        return;
+      }
+
+      enviar.disabled = true;
+      enviar.textContent = 'Enviando mensaje…';
+      setEstado('');
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+        const json = (await res.json()) as RespuestaContacto;
+        if (json.ok) {
+          form.reset();
+          tocados.clear();
+          inicio.value = String(Date.now());
+          campos.forEach((c) => pintarError(c, undefined));
+          setEstado('Mensaje enviado. Te respondo al email que escribiste.', 'exito');
+        } else {
+          if (json.errores) campos.forEach((c) => pintarError(c, json.errores?.[c]));
+          setEstado(json.mensaje, 'error');
+        }
+      } catch {
+        setEstado(
+          'No se pudo enviar: parece que no hay conexión. Revisa tu internet y vuelve a intentarlo, o escríbeme al email de arriba.',
+          'error',
+        );
+      } finally {
+        enviar.disabled = false;
+        enviar.textContent = 'Enviar mensaje';
+      }
+    });
+  }
+</script>

@@ -1,0 +1,120 @@
+---
+import { trayectoria } from '@/data/perfil';
+---
+
+<section class="seccion" id="trayectoria" aria-labelledby="trayectoria-titulo">
+  <div class="contenedor">
+    <h2 id="trayectoria-titulo" class="titulo-seccion">
+      Trayectoria
+    </h2>
+    <!-- Aquí sí hay orden: es una secuencia en el tiempo, de lo más reciente a lo más antiguo. -->
+    <ol class="linea" role="list">
+      {trayectoria.map((item) => (
+        <li class:list={['hito', { 'hito--previsto': item.previsto }]}>
+          <time class="hito__fecha" datetime={item.iso}>
+            {item.fecha}
+          </time>
+          <div>
+            <h3 class="hito__titulo">{item.titulo}</h3>
+            <p class="texto-suave">{item.detalle}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .linea {
+    list-style: none;
+    padding: 0;
+    max-width: 56rem;
+  }
+
+  .hito {
+    position: relative;
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--e-5);
+    padding: 0 0 var(--e-7) var(--e-6);
+    border-left: var(--trazo) solid var(--tinta);
+  }
+
+  .hito:last-child {
+    padding-bottom: 0;
+  }
+
+  /* Cada hito es un punto sobre la línea; el previsto va hueco porque todavía no pasa. */
+  .hito::before {
+    content: '';
+    position: absolute;
+    left: -0.5625rem;
+    top: 0.3rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--resalte);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--resalte) 25%, transparent);
+  }
+
+  .hito--previsto {
+    border-left-style: dashed;
+  }
+
+  .hito--previsto::before {
+    background: var(--fondo);
+    border: var(--trazo) solid var(--tinta);
+  }
+
+  .hito__fecha {
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hito__titulo {
+    font-size: var(--t-2);
+    font-stretch: 110%;
+    font-weight: 750;
+    line-height: 1.2;
+    margin-bottom: var(--e-2);
+  }
+
+  @media (max-width: 40rem) {
+    .hito {
+      grid-template-columns: 1fr;
+      gap: var(--e-1);
+    }
+  }
+
+  /* La línea se dibuja con el scroll y cada hito se enciende al entrar. Solo donde el navegador lo soporta. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hito {
+        animation: encender linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 40%;
+      }
+
+      .hito::before {
+        animation: punto linear both;
+        animation-timeline: view();
+        animation-range: entry 20% cover 45%;
+      }
+    }
+  }
+
+  @keyframes encender {
+    from {
+      opacity: 0.25;
+      transform: translateX(-12px);
+      border-left-color: transparent;
+    }
+  }
+
+  @keyframes punto {
+    from {
+      transform: scale(0.3);
+      background: var(--tinta-suave);
+    }
+  }
+</style>

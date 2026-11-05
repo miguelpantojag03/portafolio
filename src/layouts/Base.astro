@@ -1,0 +1,120 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@/styles/tokens.css';
+import '@/styles/base.css';
+import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import Aviso from '@/components/Aviso.astro';
+import { perfil } from '@/data/perfil';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+  /** Ruta de la imagen para compartir, relativa al sitio. */
+  imagen?: string;
+  noIndexar?: boolean;
+  /** Datos estructurados JSON-LD para esta página. */
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  titulo,
+  descripcion = perfil.descripcion,
+  imagen = '/og.png',
+  noIndexar = false,
+  jsonLd,
+} = Astro.props;
+
+const tituloCompleto = titulo
+  ? `${titulo} | ${perfil.nombreCorto}`
+  : `${perfil.nombre}, ${perfil.rol.toLowerCase()}`;
+const canonica = new URL(Astro.url.pathname, Astro.site);
+const imagenAbsoluta = new URL(imagen, Astro.site);
+---
+
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonica} />
+    {noIndexar && <meta name="robots" content="noindex" />}
+
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#e6eeff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#081634" media="(prefers-color-scheme: dark)" />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content={perfil.nombre} />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={imagenAbsoluta} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${perfil.nombre}: ${perfil.queHago}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={tituloCompleto} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={imagenAbsoluta} />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <!-- Antes de pintar: marca que hay JS y aplica el tema guardado, para que no parpadee. -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try {
+        const tema = localStorage.getItem('tema');
+        if (tema === 'dia' || tema === 'noche') document.documentElement.dataset.tema = tema;
+      } catch {
+        // Sin almacenamiento disponible: se usa el tema del sistema.
+      }
+    </script>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">
+      Saltar al contenido
+    </a>
+    <Header />
+    <main id="contenido" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <Aviso />
+  </body>
+</html>
+
+<style>
+  .saltar {
+    position: absolute;
+    left: var(--e-4);
+    top: var(--e-4);
+    z-index: 100;
+    padding: var(--e-3) var(--e-5);
+    background: var(--accion);
+    color: var(--sobre-accion);
+    font-weight: 700;
+    border-radius: var(--radio-boton);
+    transform: translateY(-200%);
+  }
+
+  .saltar:focus {
+    transform: none;
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>

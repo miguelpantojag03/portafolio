@@ -1,0 +1,43 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+
+<Base titulo="Página no encontrada" descripcion="Esta dirección no existe en el sitio." noIndexar>
+  <section class="contenedor no-encontrada">
+    <h1 class="no-encontrada__titulo">Fuera de lugar</h1>
+    <p class="entradilla">
+      Esta dirección no existe. Puede que el enlace esté mal escrito o que la página haya cambiado de nombre.
+    </p>
+    <div class="no-encontrada__acciones">
+      <a class="boton boton--principal" href="/">
+        Ir al inicio
+      </a>
+      <a class="boton" href="/#proyectos">
+        Ver proyectos
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .no-encontrada {
+    padding-block: var(--e-9) var(--e-10);
+    display: grid;
+    gap: var(--e-5);
+  }
+
+  /* «Fuera de lugar»: el fuera de juego del fútbol. */
+  .no-encontrada__titulo {
+    font-size: var(--t-cartel);
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 0.88;
+    text-transform: uppercase;
+  }
+
+  .no-encontrada__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-3);
+  }
+</style>

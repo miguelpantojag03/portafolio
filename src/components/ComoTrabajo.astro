@@ -1,0 +1,155 @@
+---
+import { formaDeTrabajo, tecnologias, type Tecnologia } from '@/data/perfil';
+import { titulosPorSlug } from '@/lib/proyectos';
+
+const titulos = await titulosPorSlug();
+
+const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[] = [
+  {
+    id: 'en-proyectos',
+    titulo: 'Usadas en estos proyectos',
+    nota: 'Cada una lleva al proyecto donde la puedes ver.',
+    items: tecnologias.enProyectos,
+  },
+  {
+    id: 'fuera',
+    titulo: 'También las he usado',
+    nota: 'En clases y prácticas que no están publicadas aquí.',
+    items: tecnologias.fueraDeProyectos,
+  },
+  {
+    id: 'aprendiendo',
+    titulo: 'Estoy aprendiendo',
+    nota: '',
+    items: tecnologias.aprendiendo,
+  },
+].filter((g) => g.items.length > 0);
+---
+
+<section class="seccion" id="como-trabajo" aria-labelledby="trabajo-titulo">
+  <div class="contenedor trabajo">
+    <h2 id="trabajo-titulo" class="titulo-seccion">
+      Cómo trabajo
+    </h2>
+
+    <ul class="habitos" role="list">
+      {formaDeTrabajo.map((h) => (
+        <li>
+          <h3 class="habito__titulo">{h.titulo}</h3>
+          <p class="texto-suave">{h.texto}</p>
+        </li>
+      ))}
+    </ul>
+
+    <div class="tecnologias">
+      {grupos.map((g) => (
+        <section class="grupo" aria-labelledby={`grupo-${g.id}`}>
+          <h3 id={`grupo-${g.id}`} class="grupo__titulo">
+            {g.titulo}
+          </h3>
+          {g.nota && <p class="grupo__nota texto-suave">{g.nota}</p>}
+          <ul class="tabla" role="list">
+            {g.items.map((t) => (
+              <li class="fila">
+                <span class="fila__nombre">{t.nombre}</span>
+                {t.proyectos && t.proyectos.length > 0 ? (
+                  <span class="fila__donde">
+                    {t.proyectos.map((slug, i) => (
+                      <>
+                        <a href={`/proyectos/${slug}`}>{titulos.get(slug) ?? slug}</a>
+                        {i < t.proyectos!.length - 1 && ', '}
+                      </>
+                    ))}
+                  </span>
+                ) : (
+                  t.nota && <span class="fila__donde texto-suave">{t.nota}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .habitos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--e-6) var(--e-7);
+    list-style: none;
+    padding: 0;
+    margin-bottom: var(--e-9);
+  }
+
+  .habito__titulo {
+    font-size: var(--t-2);
+    font-stretch: 110%;
+    font-weight: 750;
+    margin-bottom: var(--e-3);
+  }
+
+  .habitos p {
+    max-width: 40ch;
+  }
+
+  .tecnologias {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--e-8);
+    align-items: start;
+  }
+
+  .grupo__titulo {
+    font-size: var(--t-2);
+    font-stretch: 110%;
+    font-weight: 750;
+  }
+
+  .grupo__nota {
+    margin-top: var(--e-2);
+    font-size: 0.9375rem;
+  }
+
+  .tabla {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--e-5);
+    border-top: var(--trazo) solid var(--tinta);
+  }
+
+  .fila {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--e-4);
+    padding-block: var(--e-3);
+    border-bottom: 1px solid var(--tinta-suave);
+  }
+
+  .fila__nombre {
+    font-weight: 650;
+  }
+
+  .fila__donde a {
+    min-height: 1.5rem;
+    text-decoration-thickness: 1px;
+  }
+
+  .fila__donde a:hover {
+    color: var(--accion);
+  }
+
+  @media (max-width: 55rem) {
+    .tecnologias {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .fila {
+      grid-template-columns: 1fr;
+      gap: var(--e-1);
+    }
+  }
+</style>
