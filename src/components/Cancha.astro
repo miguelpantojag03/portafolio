@@ -5,15 +5,7 @@
  * Las posiciones son botones reales: funciona con teclado y lector de pantalla. Arrastrar al jugador es un extra.
  */
 import { obtenerProyectos } from '@/lib/proyectos';
-
-/** Coordenadas en unidades del viewBox (100 × 140). La portería de ataque está arriba. */
-const posiciones: Record<string, { x: number; y: number; puesto: string; corto: string }> = {
-  ascua: { x: 50, y: 26, puesto: 'Delantero', corto: 'Ascua' },
-  hp: { x: 19, y: 56, puesto: 'Extremo izquierdo', corto: 'HP' },
-  kalma: { x: 81, y: 56, puesto: 'Extremo derecho', corto: 'Kalma' },
-  prestalab: { x: 50, y: 114, puesto: 'Defensa central', corto: 'PrestaLab' },
-};
-const jugador = { x: 50, y: 84 };
+import { jugador, posiciones } from '@/data/cancha';
 
 const proyectos = (await obtenerProyectos()).filter((p) => posiciones[p.id]);
 const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
@@ -74,7 +66,15 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
       ></path>
     </svg>
 
-    <div class="jugador" data-jugador style={pct(jugador.x, jugador.y)} aria-hidden="true" title="Arrástrame">
+    <div
+      class="jugador"
+      data-jugador
+      data-x={jugador.x}
+      data-y={jugador.y}
+      style={pct(jugador.x, jugador.y)}
+      aria-hidden="true"
+      title="Arrástrame"
+    >
       10
     </div>
     <div class="balon" data-balon aria-hidden="true"></div>
@@ -97,7 +97,9 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
           data-area={p.data.area}
           data-url={`/proyectos/${p.id}`}
         >
-          <span class="posicion__punto" aria-hidden="true" />
+          <span class="posicion__punto" aria-hidden="true">
+            {pos.dorsal}
+          </span>
           <span class="posicion__nombre">{pos.corto}</span>
           <span class="solo-lectores">, {pos.puesto}</span>
         </button>
@@ -190,9 +192,16 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
   }
 
   .posicion__punto {
-    width: 1.75rem;
-    height: 1.75rem;
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
     border-radius: 50%;
+    color: var(--marino);
+    font-size: 0.75rem;
+    font-weight: 900;
+    font-stretch: 125%;
+    line-height: 1;
     background: var(--hielo);
     border: 3px solid var(--marino);
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--cal) 70%, transparent);
@@ -363,7 +372,8 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
     const jugada = pizarra.querySelector<HTMLElement>('[data-jugada]')!;
     const botones = Array.from(pizarra.querySelectorAll<HTMLButtonElement>('[data-posicion]'));
 
-    const yo = { x: 50, y: 84 };
+    const j = jugador.dataset;
+    const yo = { x: Number(j.x), y: Number(j.y) };
     let actual = botones[0];
 
     const aPorcentaje = (x: number, y: number) => ({ left: `${x}%`, top: `${(y / 140) * 100}%` });

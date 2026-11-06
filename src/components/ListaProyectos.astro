@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { obtenerProyectos } from '@/lib/proyectos';
 import { tecnologias } from '@/data/perfil';
+import { posiciones } from '@/data/cancha';
 
 const proyectos = await obtenerProyectos();
 
@@ -35,6 +36,11 @@ const tecnologiasDe = (slug: string) =>
     <ul class="proyectos" role="list">
       {proyectos.map((p) => (
         <li class="proyecto" data-proyecto data-tecnologias={JSON.stringify(tecnologiasDe(p.id))}>
+          {posiciones[p.id] && (
+            <span class="proyecto__dorsal" aria-hidden="true">
+              {posiciones[p.id]!.dorsal}
+            </span>
+          )}
           <div class="proyecto__texto">
             <h3 class="proyecto__nombre">
               <a href={`/proyectos/${p.id}`} class="proyecto__enlace">
@@ -55,8 +61,11 @@ const tecnologiasDe = (slug: string) =>
             </span>
           </div>
           <div class="proyecto__lado">
-            <p class="proyecto__area">{p.data.area}</p>
-            {p.data.portada && (
+            <p class="proyecto__area">
+              {posiciones[p.id] && <span class="proyecto__puesto">{posiciones[p.id]!.puesto} · </span>}
+              {p.data.area}
+            </p>
+            {p.data.portada ? (
               <Image
                 class="proyecto__imagen"
                 src={p.data.portada.src}
@@ -65,6 +74,12 @@ const tecnologiasDe = (slug: string) =>
                 sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 40vw, 90vw"
                 loading="lazy"
               />
+            ) : (
+              // Sin captura publicada: una mini pizarra con el dorsal y la tecnología principal.
+              <div class="proyecto__imagen proyecto__pizarra" aria-hidden="true">
+                <span class="proyecto__pizarra-dorsal">{posiciones[p.id]?.dorsal ?? ''}</span>
+                <span class="proyecto__pizarra-stack">{p.data.stack.slice(0, 2).join(' · ')}</span>
+              </div>
             )}
           </div>
         </li>
@@ -147,6 +162,51 @@ const tecnologiasDe = (slug: string) =>
       opacity var(--dur-media) var(--curva),
       transform var(--dur-media) var(--curva),
       filter var(--dur-media) var(--curva);
+  }
+
+  /* Luz que sigue al puntero (ver script): un foco de estadio sobre la tarjeta. */
+  .proyecto::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      28rem circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--verde-vivo) 22%, transparent),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity var(--dur-media) var(--curva);
+    pointer-events: none;
+  }
+
+  .proyecto:hover::after {
+    opacity: 1;
+  }
+
+  /* El dorsal del puesto, enorme y en contorno, detrás del texto. */
+  .proyecto__dorsal {
+    position: absolute;
+    right: 24rem;
+    bottom: -0.18em;
+    z-index: -1;
+    font-size: clamp(8rem, 16vw, 14rem);
+    font-weight: 900;
+    font-stretch: 125%;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 2px color-mix(in srgb, var(--tinta) 14%, transparent);
+    transition:
+      transform 600ms var(--curva-rebote),
+      -webkit-text-stroke-color var(--dur-media) var(--curva);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .proyecto:hover .proyecto__dorsal,
+  .proyecto:focus-within .proyecto__dorsal {
+    transform: translateY(-0.08em) rotate(-4deg);
+    -webkit-text-stroke-color: color-mix(in srgb, var(--hielo) 30%, transparent);
   }
 
   /* Barrido azul desde la izquierda al pasar el puntero o al enfocar. */
@@ -292,6 +352,50 @@ const tecnologiasDe = (slug: string) =>
     transform: rotate(-1.5deg) scale(1.04);
   }
 
+  .proyecto__puesto {
+    font-weight: 600;
+  }
+
+  /* Mini pizarra para los proyectos sin captura: franjas de cancha, círculo central y el dorsal. */
+  .proyecto__pizarra {
+    position: relative;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--e-1);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 2.9rem, var(--cal) 3rem, transparent 3.1rem),
+      linear-gradient(90deg, transparent calc(50% - 1px), var(--cal) 0 calc(50% + 1px), transparent 0),
+      repeating-linear-gradient(90deg, var(--cancha) 0 2.5rem, var(--cancha-2) 2.5rem 5rem);
+    box-shadow:
+      inset 0 0 0 0.6rem var(--cancha),
+      inset 0 0 0 calc(0.6rem + 2px) var(--cal);
+    color: var(--hielo);
+  }
+
+  .proyecto__pizarra-dorsal {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background: var(--azul);
+    border: 3px solid var(--cal);
+    font-size: 2rem;
+    font-weight: 900;
+    font-stretch: 125%;
+    box-shadow: 0 10px 20px -8px rgb(8 22 52 / 0.7);
+  }
+
+  .proyecto__pizarra-stack {
+    padding: 2px 10px;
+    border-radius: var(--radio-boton);
+    background: color-mix(in srgb, var(--marino) 80%, transparent);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
   @media (max-width: 47.99rem) {
     .proyecto {
       grid-template-columns: 1fr;
@@ -307,10 +411,36 @@ const tecnologiasDe = (slug: string) =>
       width: 100%;
       transform: none;
     }
+
+    .proyecto__dorsal {
+      right: var(--e-4);
+      bottom: auto;
+      top: var(--e-2);
+      font-size: 6rem;
+    }
+  }
+
+  @media (max-width: 64rem) and (min-width: 48rem) {
+    .proyecto__dorsal {
+      right: 50%;
+    }
   }
 </style>
 
 <script>
+  // Luz que sigue al puntero sobre cada tarjeta.
+  document.querySelectorAll<HTMLElement>('[data-proyecto]').forEach((tarjeta) => {
+    tarjeta.addEventListener(
+      'pointermove',
+      (e) => {
+        const caja = tarjeta.getBoundingClientRect();
+        tarjeta.style.setProperty('--mx', `${e.clientX - caja.left}px`);
+        tarjeta.style.setProperty('--my', `${e.clientY - caja.top}px`);
+      },
+      { passive: true },
+    );
+  });
+
   const filtro = document.querySelector<HTMLElement>('[data-filtro]');
   const estado = document.querySelector<HTMLElement>('[data-filtro-estado]');
   const filas = Array.from(document.querySelectorAll<HTMLElement>('[data-proyecto]'));
