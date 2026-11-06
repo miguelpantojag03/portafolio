@@ -438,7 +438,14 @@ const enlaces = [
           headers: { Accept: 'application/json' },
           body: new FormData(form),
         });
-        const json = (await res.json()) as RespuestaContacto;
+        // Si el servidor falla antes de nuestra función (p. ej. una página de error en HTML), no es JSON.
+        const esJson = (res.headers.get('content-type') ?? '').includes('application/json');
+        const json: RespuestaContacto = esJson
+          ? ((await res.json()) as RespuestaContacto)
+          : {
+              ok: false,
+              mensaje: `El servidor respondió con un error (${res.status}). Vuelve a intentarlo en unos minutos o escríbeme al email de arriba.`,
+            };
         if (json.ok) {
           form.reset();
           tocados.clear();

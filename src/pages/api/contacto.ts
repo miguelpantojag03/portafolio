@@ -17,6 +17,12 @@ const TIEMPO_MINIMO_MS = 3000;
 const envios = new Map<string, number[]>();
 
 function excedeLimite(ip: string, ahora: number): boolean {
+  // Limpieza: sin esto, el mapa crece con cada IP nueva mientras la instancia siga viva.
+  if (envios.size > 500) {
+    for (const [clave, tiempos] of envios) {
+      if (tiempos.every((t) => ahora - t >= VENTANA_MS)) envios.delete(clave);
+    }
+  }
   const recientes = (envios.get(ip) ?? []).filter((t) => ahora - t < VENTANA_MS);
   recientes.push(ahora);
   envios.set(ip, recientes);

@@ -265,8 +265,14 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
     z-index: 2;
   }
 
-  .jugador:active {
+  .jugador:active,
+  .jugador.arrastrando {
     cursor: grabbing;
+  }
+
+  .jugador.arrastrando {
+    scale: 1.12;
+    box-shadow: 0 14px 26px -8px rgb(8 22 52 / 0.7);
   }
 
   .balon {
@@ -445,9 +451,14 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
       const soltar = () => {
         jugador.removeEventListener('pointermove', mover);
         jugador.removeEventListener('pointerup', soltar);
+        jugador.removeEventListener('pointercancel', soltar);
+        jugador.classList.remove('arrastrando');
       };
+      jugador.classList.add('arrastrando');
       jugador.addEventListener('pointermove', mover);
       jugador.addEventListener('pointerup', soltar);
+      // Si el sistema cancela el toque (scroll, llamada, cambio de pestaña), también se suelta.
+      jugador.addEventListener('pointercancel', soltar);
     });
 
     // «gol»: el balón sale del 10 y entra al arco.
