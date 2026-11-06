@@ -1,31 +1,226 @@
+---
+import { perfil } from '@/data/perfil';
+
+const enlaces = [
+  { href: '/#proyectos', texto: 'Proyectos' },
+  { href: '/#sobre-mi', texto: 'Sobre mí' },
+  { href: '/#trayectoria', texto: 'Trayectoria' },
+  { href: '/#contacto', texto: 'Contacto' },
+  { href: '/cv', texto: 'CV' },
+];
+const externos = [
+  { href: perfil.github, texto: 'GitHub' },
+  { href: perfil.linkedin, texto: 'LinkedIn' },
+  { href: 'https://github.com/miguelpantojag03/portafolio', texto: 'Código de este sitio' },
+];
+const anio = new Date().getFullYear();
+---
+
 <footer class="pie">
-  <div class="contenedor pie__fila">
-    <p>
-      <a href="https://github.com/miguelpantojag03/portafolio" rel="noopener" target="_blank">
-        Código de este sitio<span class="solo-lectores"> (se abre en otra pestaña)</span>
+  <div class="pie__cancha" aria-hidden="true"></div>
+  <div class="contenedor pie__rejilla">
+    <div class="pie__firma">
+      <p class="pie__nombre">
+        <span class="pie__dorsal" aria-hidden="true">
+          10
+        </span>
+        {perfil.nombreCorto}
+      </p>
+      <p class="pie__lema">{perfil.queHago}</p>
+      <a class="pie__email" href={`mailto:${perfil.email}`}>
+        {perfil.email}
       </a>
+    </div>
+
+    <nav class="pie__columna" aria-label="Secciones">
+      <ul role="list">
+        {enlaces.map((e) => (
+          <li>
+            <a href={e.href}>{e.texto}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="pie__columna">
+      <ul role="list" aria-label="En otros sitios">
+        {externos.map((e) => (
+          <li>
+            <a href={e.href} rel="me noopener" target="_blank">
+              {e.texto}
+              <span class="solo-lectores"> (se abre en otra pestaña)</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="contenedor pie__base">
+    <p>
+      © {anio} {perfil.nombre} · Hecho en {perfil.ciudad}.
     </p>
+    <p class="pie__pista requiere-js">Pista: escribe «gol» en cualquier parte.</p>
+    <a class="pie__arriba" href="#contenido">
+      Volver arriba
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14">
+        <path d="M7 12V2M2.5 6.5 7 2l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2"></path>
+      </svg>
+    </a>
   </div>
 </footer>
 
 <style>
+  /* El pie es la cancha vista de lejos: azul noche en ambos temas, con la línea y el círculo central. */
   .pie {
-    border-top: var(--trazo) solid var(--tinta);
-    padding-block: var(--e-7);
+    position: relative;
+    overflow: hidden;
+    margin-top: var(--e-8);
+    padding-block: var(--e-9) var(--e-6);
+    background: var(--azul-noche);
+    color: var(--hielo);
     font-size: 0.9375rem;
   }
 
-  .pie__fila {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: var(--e-3) var(--e-6);
+  .pie__cancha {
+    --linea: color-mix(in srgb, var(--cal) 14%, transparent);
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 85% 0%, transparent 9rem, var(--linea) 9rem 9.15rem, transparent 9.15rem),
+      linear-gradient(var(--linea) 0 0) 85% 0 / 2px 55% no-repeat;
+    pointer-events: none;
   }
 
-  .pie a {
+  .pie :focus-visible {
+    outline-color: var(--verde-vivo);
+  }
+
+  .pie__rejilla {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--e-7);
+  }
+
+  .pie__nombre {
+    display: flex;
+    align-items: center;
+    gap: var(--e-3);
+    font-size: var(--t-4);
+    font-weight: 900;
+    font-stretch: 125%;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .pie__dorsal {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--azul);
+    border: 3px solid var(--cal);
+    font-size: 1.125rem;
+  }
+
+  .pie__lema {
+    margin-top: var(--e-4);
+    font-size: var(--t-2);
+    font-weight: 600;
+    color: #b9c9ef;
+    max-width: 28ch;
+  }
+
+  .pie__email {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
+    margin-top: var(--e-3);
+    font-weight: 700;
+    color: var(--verde-vivo);
+    overflow-wrap: anywhere;
+  }
+
+  .pie__columna ul {
+    display: grid;
+    gap: var(--e-1);
+    list-style: none;
+    padding: 0;
+  }
+
+  .pie__columna a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      color var(--dur-corta) var(--curva),
+      translate var(--dur-media) var(--curva-rebote);
+  }
+
+  .pie__columna a:hover {
+    color: var(--verde-vivo);
+    translate: 4px 0;
+  }
+
+  .pie__base {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--e-3) var(--e-6);
+    margin-top: var(--e-8);
+    padding-top: var(--e-5);
+    border-top: 1px solid color-mix(in srgb, var(--hielo) 18%, transparent);
+    color: #b9c9ef;
+  }
+
+  .pie__pista {
+    font-style: italic;
+  }
+
+  .pie__arriba {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--e-2);
+    min-height: 2.75rem;
+    padding-inline: var(--e-4);
+    border: var(--trazo) solid currentColor;
+    border-radius: var(--radio-boton);
+    color: var(--hielo);
+    font-weight: 650;
+    text-decoration: none;
+    transition:
+      background-color var(--dur-corta) var(--curva),
+      color var(--dur-corta) var(--curva);
+  }
+
+  .pie__arriba:hover {
+    background: var(--hielo);
+    color: var(--azul-noche);
+  }
+
+  .pie__arriba svg {
+    transition: translate var(--dur-media) var(--curva-rebote);
+  }
+
+  .pie__arriba:hover svg {
+    translate: 0 -3px;
+  }
+
+  @media (max-width: 47.99rem) {
+    .pie__rejilla {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .pie__firma {
+      grid-column: 1 / -1;
+    }
   }
 </style>
 

@@ -34,7 +34,7 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
 
     <ul class="habitos" role="list">
       {formaDeTrabajo.map((h) => (
-        <li>
+        <li class="revelar">
           <h3 class="habito__titulo">{h.titulo}</h3>
           <p class="texto-suave">{h.texto}</p>
         </li>
@@ -43,7 +43,7 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
 
     <div class="tecnologias">
       {grupos.map((g) => (
-        <section class="grupo" aria-labelledby={`grupo-${g.id}`}>
+        <section class="grupo revelar" aria-labelledby={`grupo-${g.id}`}>
           <h3 id={`grupo-${g.id}`} class="grupo__titulo">
             {g.titulo}
           </h3>

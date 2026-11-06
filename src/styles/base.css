@@ -213,3 +213,25 @@ html:not(.js) .requiere-js {
     border-color: ButtonText;
   }
 }
+
+/*
+ * Aparición al hacer scroll: los bloques con .revelar suben y se encienden al entrar en pantalla.
+ * Solo CSS (scroll-driven animations); donde no hay soporte o con movimiento reducido, se ven quietos.
+ * El keyframe solo define el inicio: el final es el valor normal del elemento, así no pisa otros estados.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .revelar {
+      animation: revelar linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+@keyframes revelar {
+  from {
+    opacity: 0;
+    translate: 0 2.5rem;
+  }
+}

@@ -35,7 +35,7 @@ const tecnologiasDe = (slug: string) =>
 
     <ul class="proyectos" role="list">
       {proyectos.map((p) => (
-        <li class="proyecto" data-proyecto data-tecnologias={JSON.stringify(tecnologiasDe(p.id))}>
+        <li class="proyecto revelar" data-proyecto data-tecnologias={JSON.stringify(tecnologiasDe(p.id))}>
           {posiciones[p.id] && (
             <span class="proyecto__dorsal" aria-hidden="true">
               {posiciones[p.id]!.dorsal}

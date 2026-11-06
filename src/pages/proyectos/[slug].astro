@@ -104,7 +104,7 @@ const { Content } = await render(proyecto);
             Capturas
           </h2>
           {d.galeria.map((g) => (
-            <figure>
+            <figure class="revelar">
               <Image
                 src={g.src}
                 alt={g.alt}
@@ -120,7 +120,7 @@ const { Content } = await render(proyecto);
 
       <nav class="vecinos" aria-label="Otros proyectos">
         <a href={`/proyectos/${anterior.id}`} rel="prev">
-          <span class="vecinos__dir texto-suave">Proyecto anterior</span>
+          <span class="vecinos__dir texto-suave">← Proyecto anterior</span>
           <span class="vecinos__nombre">{anterior.data.titulo}</span>
         </a>
         <a href={`/proyectos/${siguiente.id}`} rel="next" class="vecinos__siguiente">

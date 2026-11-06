@@ -55,7 +55,7 @@ const enlaces = [
 
       <ul class="redes" role="list">
         {enlaces.map((e) => (
-          <li>
+          <li class="revelar">
             <a
               class="red"
               href={e.url}
@@ -86,7 +86,7 @@ const enlaces = [
       </ul>
     </div>
 
-    <form class="formulario" method="post" action="/api/contacto" data-formulario>
+    <form class="formulario revelar" method="post" action="/api/contacto" data-formulario>
       <h3 class="formulario__titulo">O déjame un mensaje aquí</h3>
 
       <div class="campo">
