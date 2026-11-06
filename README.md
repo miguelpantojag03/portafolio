@@ -44,7 +44,7 @@ Las pruebas usan Microsoft Edge (`PW_CHANNEL=msedge`, el valor por defecto). Par
 
 ```
 src/
-├── components/      Hero, Cancha (pizarra táctica), ListaProyectos, ComoTrabajo, SobreMi, Trayectoria, Contacto…
+├── components/      Hero (con marcador), Cancha (pizarra táctica), Valla (LED de tecnologías), ListaProyectos, ComoTrabajo, SobreMi, Trayectoria, Contacto…
 ├── content/
 │   └── proyectos/   Un archivo .md por proyecto: datos arriba, caso de estudio abajo
 ├── data/perfil.ts   Datos personales, "Ahora mismo", trayectoria y tecnologías
@@ -69,7 +69,7 @@ En [src/data/perfil.ts](src/data/perfil.ts), cambia `ahoraMismo.items` y la fech
 2. Copia el frontmatter de un proyecto existente y llénalo. Los campos obligatorios están en [src/content.config.ts](src/content.config.ts): si falta uno, `npm run build` dice cuál.
 3. Pon las capturas en `src/assets/proyectos/mi-proyecto/` y enlázalas en `portada` y `galeria`. Astro las convierte a WebP con varios tamaños.
 4. Escribe el caso de estudio con estas secciones `##`: El problema, Mi papel, Decisiones técnicas, Arquitectura (una lista numerada, que se dibuja como diagrama), Resultado y Qué aprendí.
-5. Para que aparezca en la cancha del inicio, agrega su posición en `posiciones` dentro de [src/components/Cancha.astro](src/components/Cancha.astro).
+5. Para que aparezca en la cancha del inicio, agrega su posición y su dorsal en `posiciones` dentro de [src/data/cancha.ts](src/data/cancha.ts). La cancha y las tarjetas de proyectos lo leen de ahí.
 6. Enlaza las tecnologías con el proyecto en `tecnologias.enProyectos` de [src/data/perfil.ts](src/data/perfil.ts).
 
 ### Trayectoria, tecnologías y textos
@@ -95,6 +95,8 @@ El formulario tiene validación en el navegador y en el servidor (la misma funci
 2. En [vercel.com/new](https://vercel.com/new), importa el repositorio. Vercel detecta Astro solo; no hay que cambiar nada.
 3. Agrega las variables de entorno de la tabla de arriba.
 4. Cada `git push` a `main` publica una versión nueva.
+
+[vercel.json](vercel.json) agrega cabeceras de seguridad (sin `iframe` ajeno, sin rastreo del referer completo, sin cámara ni micrófono) y caché larga para los archivos con hash de `/_astro`.
 
 ### Conectar un dominio propio
 
