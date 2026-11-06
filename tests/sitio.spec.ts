@@ -4,7 +4,10 @@ test('el inicio dice quién soy, qué hago y cómo contactarme', async ({ page }
   await page.goto('/');
   await expect(page).toHaveTitle(/Miguel Ángel Pantoja Guerra/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Pantoja');
-  await expect(page.getByText('Construyo apps completas: del reloj al servidor.')).toBeVisible();
+  // El pie repite la frase: se busca solo en el contenido principal.
+  await expect(
+    page.getByRole('main').getByText('Construyo apps completas: del reloj al servidor.'),
+  ).toBeVisible();
   await expect(page.getByRole('link', { name: 'Escríbeme' })).toHaveAttribute('href', '#contacto');
   await expect(page.locator('#proyectos .proyecto')).toHaveCount(4);
 });
@@ -105,7 +108,7 @@ test('una dirección que no existe muestra la 404 con salidas', async ({ page })
 test('el CV tiene los datos y no incluye la cédula', async ({ page }) => {
   await page.goto('/cv');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Miguel Ángel Pantoja Guerra');
-  await expect(page.getByText('miguelpantojag03@gmail.com')).toBeVisible();
+  await expect(page.getByRole('main').getByText('miguelpantojag03@gmail.com')).toBeVisible();
   await expect(page.locator('body')).not.toContainText(/c[ée]dula|\d{8,}/i);
 });
 
@@ -124,4 +127,14 @@ test('la cancha muestra el proyecto de cada posición y el filtro resalta por te
   await page.getByRole('button', { name: 'Supabase', exact: true }).click();
   await expect(page.getByText('2 proyectos usan Supabase.')).toBeVisible();
   await expect(page.locator('.proyecto.atenuado')).toHaveCount(2);
+});
+
+test('el marcador muestra datos reales y cada proyecto lleva su dorsal', async ({ page }) => {
+  await page.goto('/');
+  const marcador = page.locator('.marcador');
+  await expect(marcador.getByRole('definition').first()).toHaveText('4');
+  await expect(marcador).toContainText('2028');
+  // Mismo dorsal en la cancha y en la tarjeta: PrestaLab es el 4.
+  await expect(page.getByRole('button', { name: /PrestaLab/ })).toContainText('4');
+  await expect(page.locator('[data-proyecto]').nth(1).locator('.proyecto__dorsal')).toHaveText('4');
 });
