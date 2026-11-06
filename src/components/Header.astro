@@ -11,9 +11,13 @@ const enlaces = [
 const ruta = Astro.url.pathname;
 ---
 
-<header class="cabecera">
+<header class="cabecera" data-cabecera>
+  <div class="cabecera__progreso" aria-hidden="true"></div>
   <div class="contenedor cabecera__fila">
     <a class="marca" href="/" aria-current={ruta === '/' ? 'page' : undefined}>
+      <span class="marca__dorsal" aria-hidden="true">
+        10
+      </span>
       {perfil.nombreCorto}
     </a>
 
@@ -32,7 +36,11 @@ const ruta = Astro.url.pathname;
         <ul class="menu__lista">
           {enlaces.map((e) => (
             <li>
-              <a href={e.href} aria-current={ruta === e.href ? 'page' : undefined}>
+              <a
+                href={e.href}
+                aria-current={ruta === e.href ? 'page' : undefined}
+                data-seccion={e.href.startsWith('/#') ? e.href.slice(2) : undefined}
+              >
                 {e.texto}
               </a>
             </li>
@@ -48,10 +56,62 @@ const ruta = Astro.url.pathname;
 </header>
 
 <style>
+  /*
+   * Fija arriba. El fondo translúcido va en un pseudo-elemento: si el backdrop-filter estuviera en la
+   * cabecera, el menú móvil (position: fixed) quedaría atrapado dentro de ella.
+   */
   .cabecera {
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: var(--z-header);
-    background: var(--fondo);
+  }
+
+  .cabecera::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--fondo) 82%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    border-bottom: 1px solid transparent;
+    transition:
+      border-color var(--dur-media) var(--curva),
+      box-shadow var(--dur-media) var(--curva);
+  }
+
+  .cabecera[data-scroll]::before {
+    border-bottom-color: color-mix(in srgb, var(--tinta) 12%, transparent);
+    box-shadow: 0 10px 30px -24px color-mix(in srgb, var(--azul-noche) 60%, transparent);
+  }
+
+  /* Progreso de lectura: una línea verde que se llena al bajar. Solo donde hay scroll-timeline. */
+  .cabecera__progreso {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .cabecera__progreso {
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accion), var(--resalte));
+      transform-origin: left;
+      animation: progreso linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+
+  @keyframes progreso {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
   }
 
   .cabecera__fila {
@@ -63,6 +123,9 @@ const ruta = Astro.url.pathname;
   }
 
   .marca {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--e-2);
     font-weight: 800;
     font-stretch: 115%;
     font-size: 1.125rem;
@@ -92,10 +155,50 @@ const ruta = Astro.url.pathname;
     text-decoration: none;
   }
 
-  .menu__lista a:hover,
-  .menu__lista a[aria-current='page'] {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
+  /* El dorsal del 10 junto al nombre: la misma ficha de la pizarra. */
+  .marca__dorsal {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--azul);
+    color: var(--hielo);
+    font-size: 0.8125rem;
+    font-weight: 900;
+    font-stretch: 125%;
+    transition: transform var(--dur-media) var(--curva-rebote);
+  }
+
+  .marca:hover .marca__dorsal {
+    transform: rotate(-12deg) scale(1.1);
+  }
+
+  .menu__lista a {
+    position: relative;
+  }
+
+  /* Subrayado que crece desde el centro; queda puesto en la sección que se está leyendo. */
+  .menu__lista a::after {
+    content: '';
+    position: absolute;
+    left: var(--e-3);
+    right: var(--e-3);
+    bottom: 0.55rem;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transition: transform var(--dur-media) var(--curva);
+  }
+
+  .menu__lista a:hover::after,
+  .menu__lista a[aria-current]::after {
+    transform: scaleX(1);
+  }
+
+  .menu__lista a[aria-current] {
+    color: var(--accion);
   }
 
   .menu-boton,
@@ -137,6 +240,12 @@ const ruta = Astro.url.pathname;
       gap: var(--e-2);
     }
 
+    html.js .menu__lista a::after {
+      left: 0;
+      right: 0;
+      bottom: 0.2rem;
+    }
+
     html.js .menu__lista a {
       font-size: var(--t-4);
       font-weight: 800;
@@ -176,6 +285,37 @@ const ruta = Astro.url.pathname;
 </style>
 
 <script>
+  // Sombra al bajar y sección activa en el menú (solo en el inicio, donde están las secciones).
+  const cabecera = document.querySelector<HTMLElement>('[data-cabecera]');
+  if (cabecera) {
+    const marcar = () => cabecera.toggleAttribute('data-scroll', window.scrollY > 8);
+    marcar();
+    window.addEventListener('scroll', marcar, { passive: true });
+  }
+
+  const enlacesSeccion = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-seccion]'));
+  const secciones = enlacesSeccion
+    .map((a) => document.getElementById(a.dataset.seccion!))
+    .filter((s): s is HTMLElement => s !== null);
+  if (secciones.length > 0) {
+    const visibles = new Set<string>();
+    const obs = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((en) =>
+          en.isIntersecting ? visibles.add(en.target.id) : visibles.delete(en.target.id),
+        );
+        // La primera sección visible en orden del documento es la activa.
+        const activa = secciones.find((s) => visibles.has(s.id))?.id;
+        enlacesSeccion.forEach((a) => {
+          if (a.dataset.seccion === activa) a.setAttribute('aria-current', 'location');
+          else if (a.getAttribute('aria-current') === 'location') a.removeAttribute('aria-current');
+        });
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    secciones.forEach((s) => obs.observe(s));
+  }
+
   const menu = document.querySelector<HTMLElement>('[data-menu]');
   const abrir = document.querySelector<HTMLButtonElement>('[data-menu-abrir]');
   const cerrar = document.querySelector<HTMLButtonElement>('[data-menu-cerrar]');

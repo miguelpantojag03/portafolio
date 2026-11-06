@@ -9,7 +9,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: var(--e-8);
+  /* Deja espacio para la cabecera fija al saltar a una sección. */
+  scroll-padding-top: 5.5rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
