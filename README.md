@@ -4,6 +4,8 @@ Sitio personal de un estudiante de Ingeniería de Software en Pasto, Colombia. M
 
 El inicio es una pizarra táctica de fútbol: cada proyecto ocupa una posición en la cancha y al elegir una se dibuja el pase y aparece el proyecto. Funciona con mouse, toque y teclado.
 
+Tema oscuro por defecto (con opción de tema claro), un diagrama interactivo que muestra cómo viaja un dato por las capas de cada proyecto y una terminal donde se explora el portafolio con comandos (`ayuda`, `proyectos`, `usa react`, `abrir kalma`).
+
 ## Stack y por qué
 
 | Pieza      | Elección                                              | Por qué                                                                                                                                                                |

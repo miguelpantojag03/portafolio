@@ -1,0 +1,565 @@
+---
+/**
+ * Diagrama didáctico: las capas de cada proyecto, en orden, con un paquete de luz que las recorre.
+ * Las capas salen de la sección «Arquitectura» de cada caso de estudio (ver capasDe).
+ * Sin JavaScript se ve como listas ordenadas, una por proyecto; con JavaScript, como un diagrama
+ * que se reproduce paso a paso, con controles reales y una región viva que anuncia cada paso.
+ */
+import { capasDe, obtenerProyectos } from '@/lib/proyectos';
+import { posiciones } from '@/data/cancha';
+
+const proyectos = (await obtenerProyectos())
+  .map((p) => ({ p, capas: capasDe(p) }))
+  .filter(({ capas }) => capas.length > 1);
+---
+
+<section class="seccion" id="recorrido" aria-labelledby="recorrido-titulo">
+  <div class="contenedor">
+    <h2 id="recorrido-titulo" class="titulo-seccion">
+      Cómo viaja un dato
+    </h2>
+    <p class="entradilla texto-suave recorrido__intro">
+      Cada proyecto tiene capas que se pasan el balón. Elige uno y dale play para ver qué hace cada parte y
+      cómo se conecta con la siguiente.
+    </p>
+
+    <div class="recorrido vidrio revelar" data-recorrido>
+      <div class="recorrido__barra requiere-js">
+        <div class="recorrido__proyectos" role="group" aria-label="Elegir proyecto">
+          {proyectos.map(({ p }, i) => (
+            <button
+              type="button"
+              class="recorrido__proyecto"
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              data-elegir={p.id}
+            >
+              {posiciones[p.id] && (
+                <span class="recorrido__dorsal" aria-hidden="true">
+                  {posiciones[p.id]!.dorsal}
+                </span>
+              )}
+              {posiciones[p.id]?.corto ?? p.data.titulo}
+            </button>
+          ))}
+        </div>
+        <div class="recorrido__controles">
+          <button type="button" class="control" data-anterior aria-label="Paso anterior">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18">
+              <path d="M15 9H4M8 4 3 9l5 5" fill="none" stroke="currentColor" stroke-width="2"></path>
+            </svg>
+          </button>
+          <button type="button" class="control control--play" data-play>
+            <svg class="icono-play" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">
+              <path d="M4 2.5v11l9-5.5z" fill="currentColor"></path>
+            </svg>
+            <svg class="icono-pausa" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">
+              <path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"></path>
+            </svg>
+            <span data-play-texto>Reproducir</span>
+          </button>
+          <button type="button" class="control" data-siguiente aria-label="Paso siguiente">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18">
+              <path d="M3 9h11M10 4l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {proyectos.map(({ p, capas }, i) => (
+        <div class="diagrama" data-diagrama={p.id} data-activo={i === 0 ? '' : undefined}>
+          <h3 class="diagrama__titulo">
+            {p.data.titulo}
+            <span class="diagrama__area texto-suave">{p.data.area}</span>
+          </h3>
+          <div class="diagrama__lienzo" data-lienzo>
+            <div class="pista" aria-hidden="true" data-pista>
+              <div class="pista__llenado" data-llenado />
+            </div>
+            <div class="paquete" aria-hidden="true" data-paquete />
+            <ol class="capas" role="list" style={`--n:${capas.length}`}>
+              {capas.map((c, j) => (
+                <li class="capa" data-capa={j} data-estado={j === 0 ? 'activo' : 'pendiente'}>
+                  <span class="capa__nodo" aria-hidden="true">
+                    {String(j + 1).padStart(2, '0')}
+                  </span>
+                  <p class="capa__nombre">{c.nombre}</p>
+                  <p class="capa__detalle">{c.detalle}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <a class="diagrama__ver" href={`/proyectos/${p.id}`}>
+            Ver la arquitectura completa de {p.data.titulo}
+          </a>
+        </div>
+      ))}
+
+      <p class="recorrido__estado requiere-js" aria-live="polite" data-estado-paso></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .recorrido__intro {
+    margin-top: calc(-1 * var(--e-5));
+    margin-bottom: var(--e-6);
+    max-width: 52ch;
+  }
+
+  .recorrido {
+    padding: var(--e-6);
+    border-radius: var(--radio-tarjeta);
+  }
+
+  .recorrido__barra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--e-4);
+    margin-bottom: var(--e-6);
+  }
+
+  .recorrido__proyectos,
+  .recorrido__controles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+  }
+
+  .recorrido__proyecto,
+  .control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--e-2);
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding: var(--e-2) var(--e-4);
+    border: 1px solid var(--borde-fuerte);
+    border-radius: var(--radio-boton);
+    background: color-mix(in srgb, var(--fondo) 50%, transparent);
+    font-weight: 650;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-corta) var(--curva),
+      border-color var(--dur-corta) var(--curva),
+      color var(--dur-corta) var(--curva),
+      transform var(--dur-corta) var(--curva);
+  }
+
+  .control {
+    padding-inline: var(--e-3);
+  }
+
+  .recorrido__proyecto:hover,
+  .control:hover {
+    border-color: var(--accion);
+  }
+
+  .recorrido__proyecto:active,
+  .control:active {
+    transform: scale(0.96);
+  }
+
+  .recorrido__proyecto[aria-pressed='true'] {
+    background: var(--degradado);
+    border-color: transparent;
+    color: var(--sobre-accion);
+  }
+
+  .recorrido__dorsal {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--tinta) 14%, transparent);
+    font-size: 0.75rem;
+    font-weight: 900;
+  }
+
+  .control--play {
+    padding-inline: var(--e-5);
+    border-color: transparent;
+    background: var(--accion);
+    color: var(--sobre-accion);
+  }
+
+  .control--play:hover {
+    border-color: transparent;
+    filter: brightness(1.1);
+  }
+
+  .icono-pausa,
+  [data-reproduciendo] .icono-play {
+    display: none;
+  }
+
+  [data-reproduciendo] .icono-pausa {
+    display: block;
+  }
+
+  .control[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Sin JavaScript se ven todos los diagramas uno debajo del otro; con JavaScript, solo el elegido. */
+  .diagrama + .diagrama {
+    margin-top: var(--e-7);
+  }
+
+  html.js .diagrama:not([data-activo]) {
+    display: none;
+  }
+
+  html.js .diagrama + .diagrama {
+    margin-top: 0;
+  }
+
+  .diagrama__titulo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--e-1) var(--e-3);
+    margin-bottom: var(--e-5);
+    font-size: var(--t-3);
+    font-stretch: 115%;
+    font-weight: 800;
+  }
+
+  .diagrama__area {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-stretch: 100%;
+  }
+
+  .diagrama__lienzo {
+    position: relative;
+  }
+
+  .capas {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: var(--e-4);
+    list-style: none;
+    padding: 0;
+  }
+
+  .capa {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--e-2);
+    padding: var(--e-5) var(--e-4) var(--e-4);
+    border: 1px solid var(--borde);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--fondo) 55%, transparent);
+    transition:
+      background-color var(--dur-media) var(--curva),
+      border-color var(--dur-media) var(--curva),
+      box-shadow var(--dur-media) var(--curva);
+  }
+
+  html.js .capa {
+    cursor: pointer;
+  }
+
+  /* La opacidad va en los textos, no en la tarjeta: así la tarjeta no tapa la pista. */
+  html.js .capa[data-estado='pendiente'] :is(.capa__nombre, .capa__detalle) {
+    opacity: 0.5;
+    transition: opacity var(--dur-media) var(--curva);
+  }
+
+  html.js .capa[data-estado='pendiente']:hover :is(.capa__nombre, .capa__detalle) {
+    opacity: 0.85;
+  }
+
+  html.js .capa[data-estado='activo'] {
+    border-color: color-mix(in srgb, var(--accion) 70%, transparent);
+    background: color-mix(in srgb, var(--accion) 12%, var(--fondo));
+    box-shadow: var(--brillo);
+  }
+
+  html.js .capa[data-estado='hecho'] {
+    border-color: color-mix(in srgb, var(--resalte) 45%, transparent);
+  }
+
+  .capa__nodo {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 2px solid var(--borde-fuerte);
+    background: var(--superficie);
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition:
+      background-color var(--dur-media) var(--curva),
+      border-color var(--dur-media) var(--curva),
+      color var(--dur-media) var(--curva);
+  }
+
+  html.js .capa[data-estado='activo'] .capa__nodo {
+    border-color: transparent;
+    background: var(--degradado);
+    color: var(--sobre-accion);
+    animation: llegar 600ms var(--curva-rebote);
+  }
+
+  html.js .capa[data-estado='hecho'] .capa__nodo {
+    border-color: var(--resalte);
+    color: var(--resalte);
+  }
+
+  @keyframes llegar {
+    from {
+      transform: scale(0.6);
+    }
+  }
+
+  .capa__nombre {
+    font-size: 1.0625rem;
+    font-weight: 750;
+    font-stretch: 105%;
+    line-height: 1.25;
+  }
+
+  .capa__detalle {
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  /* Pista y paquete: los coloca el script según dónde quedaron los nodos (horizontal o vertical). */
+  .pista,
+  .paquete {
+    display: none;
+  }
+
+  html.js .pista {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    height: 2px;
+    transform-origin: 0 50%;
+    background: repeating-linear-gradient(90deg, var(--borde-fuerte) 0 6px, transparent 6px 12px);
+  }
+
+  .pista__llenado {
+    width: var(--avance, 0px);
+    height: 100%;
+    background: var(--degradado);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--resalte) 80%, transparent);
+    transition: width 700ms var(--curva);
+  }
+
+  html.js .paquete {
+    display: block;
+    position: absolute;
+    z-index: 3;
+    width: 0.9rem;
+    height: 0.9rem;
+    margin: -0.45rem 0 0 -0.45rem;
+    border-radius: 50%;
+    background: var(--cal);
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--resalte) 45%, transparent),
+      0 0 24px 6px color-mix(in srgb, var(--resalte) 70%, transparent);
+    left: var(--x, 0px);
+    top: var(--y, 0px);
+    transition:
+      left 700ms var(--curva),
+      top 700ms var(--curva);
+    pointer-events: none;
+  }
+
+  .diagrama__ver {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-top: var(--e-4);
+    font-weight: 650;
+    color: var(--accion);
+  }
+
+  .recorrido__estado {
+    margin-top: var(--e-2);
+    min-height: 1.6em;
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    color: var(--tinta-suave);
+  }
+
+  @media (max-width: 55rem) {
+    .recorrido {
+      padding: var(--e-5) var(--e-4);
+    }
+
+    .capas {
+      grid-template-columns: 1fr;
+      gap: var(--e-3);
+    }
+
+    .capa {
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: var(--e-4);
+      padding: var(--e-4);
+    }
+
+    .capa__nodo {
+      grid-row: span 2;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pista__llenado,
+    html.js .paquete {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const raiz = document.querySelector<HTMLElement>('[data-recorrido]');
+
+  if (raiz) {
+    const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const botonesProyecto = Array.from(raiz.querySelectorAll<HTMLButtonElement>('[data-elegir]'));
+    const play = raiz.querySelector<HTMLButtonElement>('[data-play]')!;
+    const playTexto = raiz.querySelector<HTMLElement>('[data-play-texto]')!;
+    const anterior = raiz.querySelector<HTMLButtonElement>('[data-anterior]')!;
+    const siguiente = raiz.querySelector<HTMLButtonElement>('[data-siguiente]')!;
+    const estado = raiz.querySelector<HTMLElement>('[data-estado-paso]')!;
+
+    let diagrama = raiz.querySelector<HTMLElement>('[data-diagrama][data-activo]')!;
+    let paso = 0;
+    let temporizador: number | undefined;
+
+    const capas = () => Array.from(diagrama.querySelectorAll<HTMLElement>('[data-capa]'));
+
+    /** Centro de cada nodo, relativo al lienzo del diagrama. */
+    function centros() {
+      const lienzo = diagrama.querySelector<HTMLElement>('[data-lienzo]')!.getBoundingClientRect();
+      return capas().map((c) => {
+        const n = c.querySelector('.capa__nodo')!.getBoundingClientRect();
+        return { x: n.left + n.width / 2 - lienzo.left, y: n.top + n.height / 2 - lienzo.top };
+      });
+    }
+
+    /** Dibuja la pista de nodo a nodo, el avance y el paquete en el nodo activo. */
+    function colocar() {
+      const puntos = centros();
+      const primero = puntos[0];
+      const ultimo = puntos[puntos.length - 1];
+      const actual = puntos[paso];
+      if (!primero || !ultimo || !actual) return;
+      const pista = diagrama.querySelector<HTMLElement>('[data-pista]')!;
+      const paquete = diagrama.querySelector<HTMLElement>('[data-paquete]')!;
+      const largo = Math.hypot(ultimo.x - primero.x, ultimo.y - primero.y);
+      const angulo = Math.atan2(ultimo.y - primero.y, ultimo.x - primero.x);
+      pista.style.left = `${primero.x}px`;
+      pista.style.top = `${primero.y - 1}px`;
+      pista.style.width = `${largo}px`;
+      pista.style.transform = `rotate(${angulo}rad)`;
+      pista.style.setProperty('--avance', `${Math.hypot(actual.x - primero.x, actual.y - primero.y)}px`);
+      paquete.style.setProperty('--x', `${actual.x}px`);
+      paquete.style.setProperty('--y', `${actual.y}px`);
+    }
+
+    function irA(nuevo: number, { anunciar = true } = {}) {
+      const lista = capas();
+      paso = Math.min(Math.max(nuevo, 0), lista.length - 1);
+      lista.forEach((c, i) => {
+        c.dataset.estado = i < paso ? 'hecho' : i === paso ? 'activo' : 'pendiente';
+      });
+      anterior.disabled = paso === 0;
+      siguiente.disabled = paso === lista.length - 1;
+      colocar();
+      if (anunciar) {
+        const capa = lista[paso]!;
+        const nombre = capa.querySelector('.capa__nombre')?.textContent ?? '';
+        const detalle = capa.querySelector('.capa__detalle')?.textContent ?? '';
+        estado.textContent = `Paso ${paso + 1} de ${lista.length}: ${nombre}. ${detalle}`;
+      }
+    }
+
+    function pausar() {
+      window.clearInterval(temporizador);
+      temporizador = undefined;
+      delete play.dataset.reproduciendo;
+      playTexto.textContent = paso === capas().length - 1 ? 'Repetir' : 'Reproducir';
+    }
+
+    function reproducir() {
+      if (paso === capas().length - 1) irA(0);
+      play.dataset.reproduciendo = '';
+      playTexto.textContent = 'Pausar';
+      temporizador = window.setInterval(
+        () => {
+          if (paso >= capas().length - 1) {
+            pausar();
+            return;
+          }
+          irA(paso + 1);
+          if (paso === capas().length - 1) pausar();
+        },
+        reducir ? 2600 : 1900,
+      );
+    }
+
+    play.addEventListener('click', () => (temporizador ? pausar() : reproducir()));
+    anterior.addEventListener('click', () => {
+      pausar();
+      irA(paso - 1);
+    });
+    siguiente.addEventListener('click', () => {
+      pausar();
+      irA(paso + 1);
+    });
+
+    raiz.addEventListener('click', (e) => {
+      const capa = (e.target as HTMLElement).closest<HTMLElement>('[data-capa]');
+      if (!capa || (e.target as HTMLElement).closest('a')) return;
+      pausar();
+      irA(Number(capa.dataset.capa));
+    });
+
+    botonesProyecto.forEach((boton) =>
+      boton.addEventListener('click', () => {
+        pausar();
+        botonesProyecto.forEach((b) => b.setAttribute('aria-pressed', String(b === boton)));
+        raiz.querySelectorAll('[data-diagrama]').forEach((d) => d.removeAttribute('data-activo'));
+        diagrama = raiz.querySelector<HTMLElement>(`[data-diagrama="${boton.dataset.elegir}"]`)!;
+        diagrama.dataset.activo = '';
+        irA(0, { anunciar: false });
+        estado.textContent = `${boton.textContent?.trim()}: ${capas().length} capas. Dale play.`;
+      }),
+    );
+
+    // La pista depende del tamaño: se recalcula al cambiar el ancho (escritorio horizontal, móvil vertical).
+    new ResizeObserver(() => colocar()).observe(raiz);
+    irA(0, { anunciar: false });
+    playTexto.textContent = 'Reproducir';
+
+    // Se reproduce solo la primera vez que aparece en pantalla, para invitar a jugar con él.
+    if (!reducir && 'IntersectionObserver' in window) {
+      const obs = new IntersectionObserver(
+        (entradas) => {
+          if (entradas.some((en) => en.isIntersecting)) {
+            obs.disconnect();
+            if (paso === 0 && !temporizador) reproducir();
+          }
+        },
+        { threshold: 0.3 },
+      );
+      obs.observe(raiz);
+    }
+  }
+</script>

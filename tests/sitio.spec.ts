@@ -67,16 +67,18 @@ test('la función de contacto valida en el servidor', async ({ request }) => {
   expect(json.errores.email).toContain('email válido');
 });
 
-test('el tema Noche se aplica y se recuerda', async ({ page }) => {
+test('Noche es el tema predeterminado y Día se aplica y se recuerda', async ({ page }) => {
   await page.goto('/');
-  const noche = page.getByRole('button', { name: 'Noche' }).first();
-  if (!(await noche.isVisible())) await page.getByRole('button', { name: 'Menú', exact: true }).click();
-  await noche.click();
-  await expect(page.locator('html')).toHaveAttribute('data-tema', 'noche');
-  await expect(noche).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(5, 11, 28)');
+  const dia = page.getByRole('button', { name: 'Día' }).first();
+  if (!(await dia.isVisible())) await page.getByRole('button', { name: 'Menú', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Noche' }).first()).toHaveAttribute('aria-pressed', 'true');
+  await dia.click();
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'dia');
+  await expect(dia).toHaveAttribute('aria-pressed', 'true');
   await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-tema', 'noche');
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(8, 22, 52)');
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'dia');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(230, 238, 255)');
 });
 
 test('el menú móvil atrapa el foco y se cierra con Escape', async ({ page, isMobile }) => {
@@ -135,6 +137,36 @@ test('el marcador muestra datos reales y cada proyecto lleva su dorsal', async (
   await expect(marcador.getByRole('definition').first()).toHaveText('4');
   await expect(marcador).toContainText('2028');
   // Mismo dorsal en la cancha y en la tarjeta: PrestaLab es el 4.
-  await expect(page.getByRole('button', { name: /PrestaLab/ })).toContainText('4');
+  await expect(page.locator('[data-pizarra]').getByRole('button', { name: /PrestaLab/ })).toContainText('4');
   await expect(page.locator('[data-proyecto]').nth(1).locator('.proyecto__dorsal')).toHaveText('4');
+});
+
+test('el diagrama recorre las capas de cada proyecto paso a paso', async ({ page }) => {
+  await page.goto('/');
+  const recorrido = page.locator('[data-recorrido]');
+  await recorrido.getByRole('button', { name: 'PrestaLab' }).click();
+  const capas = recorrido.locator('[data-diagrama="prestalab"] [data-capa]');
+  await expect(capas).toHaveCount(4);
+  await expect(capas.first()).toHaveAttribute('data-estado', 'activo');
+
+  await recorrido.getByRole('button', { name: 'Paso siguiente' }).click();
+  await expect(capas.nth(1)).toHaveAttribute('data-estado', 'activo');
+  await expect(capas.first()).toHaveAttribute('data-estado', 'hecho');
+  await expect(recorrido.locator('[data-estado-paso]')).toContainText('Paso 2 de 4: nginx + React');
+});
+
+test('la terminal responde a comandos y a las sugerencias', async ({ page }) => {
+  await page.goto('/#consola');
+  const terminal = page.locator('[data-terminal]');
+  const campo = page.getByRole('textbox', { name: 'Comando' });
+  await campo.fill('usa supabase');
+  await campo.press('Enter');
+  await expect(terminal.getByRole('log')).toContainText('2 proyectos usan «supabase»');
+
+  await terminal.getByRole('button', { name: 'stack', exact: true }).click();
+  await expect(terminal.getByRole('log')).toContainText('Usadas en los proyectos publicados');
+
+  await campo.fill('xyz');
+  await campo.press('Enter');
+  await expect(terminal.getByRole('log')).toContainText('xyz: comando no encontrado');
 });

@@ -1,0 +1,729 @@
+---
+/**
+ * Consola: una terminal de verdad para explorar el portafolio con comandos.
+ * Pensada para dos públicos: quien sabe usar una terminal escribe; quien no, toca las sugerencias.
+ * Todo lo que muestra sale de los mismos datos del sitio (perfil, tecnologías y proyectos).
+ * Requiere JavaScript: sin él, la sección no se muestra y nada se pierde (todo está en el resto de la página).
+ */
+import { perfil, tecnologias, trayectoria } from '@/data/perfil';
+import { posiciones } from '@/data/cancha';
+import { obtenerProyectos } from '@/lib/proyectos';
+
+const proyectos = await obtenerProyectos();
+
+const datos = {
+  perfil: {
+    nombre: perfil.nombre,
+    rol: perfil.rol,
+    ciudad: perfil.ciudad,
+    email: perfil.email,
+    github: perfil.github,
+    linkedin: perfil.linkedin,
+    universidad: perfil.universidad,
+    semestre: perfil.semestre,
+    grado: perfil.grado,
+    queHago: perfil.queHago,
+    disponibilidad: perfil.disponibilidad,
+  },
+  proyectos: proyectos.map((p) => ({
+    id: p.id,
+    titulo: p.data.titulo,
+    resumen: p.data.resumen,
+    area: p.data.area,
+    stack: p.data.stack,
+    dorsal: posiciones[p.id]?.dorsal ?? null,
+  })),
+  stack: {
+    enProyectos: tecnologias.enProyectos.map((t) => t.nombre),
+    fueraDeProyectos: tecnologias.fueraDeProyectos.map((t) => t.nombre),
+  },
+  trayectoria: trayectoria.map((t) => ({ fecha: t.fecha, titulo: t.titulo })),
+};
+
+// JSON dentro de <script>: se escapa «<» para que ningún texto pueda cerrar la etiqueta.
+const json = JSON.stringify(datos).replace(/</g, '\\u003c');
+const sugerencias = ['ayuda', 'sobre', 'proyectos', 'stack', 'abrir kalma', 'contacto', 'tema dia'];
+---
+
+<section class="seccion requiere-js" id="consola" aria-labelledby="consola-titulo">
+  <div class="contenedor consola-seccion">
+    <div class="consola-seccion__texto">
+      <h2 id="consola-titulo" class="titulo-seccion">
+        Pregúntale a la terminal
+      </h2>
+      <p class="entradilla texto-suave">
+        Así trabajo todos los días. Escribe un comando o toca uno de abajo. Prueba <code>ayuda</code>.
+      </p>
+      <ul class="atajos texto-suave" role="list">
+        <li>
+          <kbd>Tab</kbd> completa el comando
+        </li>
+        <li>
+          <kbd>↑</kbd> <kbd>↓</kbd> recorren el historial
+        </li>
+        <li>
+          <kbd>Ctrl</kbd> + <kbd>L</kbd> limpia la pantalla
+        </li>
+      </ul>
+    </div>
+
+    <div class="terminal revelar" data-terminal>
+      <div class="terminal__barra" aria-hidden="true">
+        <span class="terminal__luz"></span>
+        <span class="terminal__luz"></span>
+        <span class="terminal__luz"></span>
+        <span class="terminal__titulo">miguel@pasto: ~/portafolio</span>
+      </div>
+      <div
+        class="terminal__salida"
+        role="log"
+        aria-live="polite"
+        aria-label="Salida de la terminal"
+        data-salida
+      ></div>
+      <form class="terminal__entrada" data-forma>
+        <label for="terminal-comando" class="terminal__prompt">
+          <span aria-hidden="true">miguel@pasto:~$</span>
+          <span class="solo-lectores">Comando</span>
+        </label>
+        <input
+          id="terminal-comando"
+          class="terminal__input"
+          type="text"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          enterkeyhint="send"
+          placeholder="escribe ayuda y presiona Enter"
+          data-comando
+        />
+      </form>
+      <div class="terminal__sugerencias" role="group" aria-label="Comandos sugeridos">
+        {sugerencias.map((s) => (
+          <button type="button" class="sugerencia" data-sugerencia={s}>
+            {s}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+  <script type="application/json" id="datos-consola" set:html={json} />
+</section>
+
+<style>
+  .consola-seccion {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--e-7);
+    align-items: start;
+  }
+
+  .consola-seccion .titulo-seccion {
+    margin-bottom: var(--e-5);
+  }
+
+  .entradilla code {
+    padding: 1px 8px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--resalte) 16%, transparent);
+    color: var(--resalte);
+  }
+
+  .atajos {
+    display: grid;
+    gap: var(--e-2);
+    margin-top: var(--e-6);
+    padding: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+  }
+
+  kbd {
+    display: inline-block;
+    min-width: 1.8em;
+    padding: 1px 7px;
+    border: 1px solid var(--borde-fuerte);
+    border-bottom-width: 3px;
+    border-radius: 6px;
+    background: var(--vidrio);
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    text-align: center;
+    color: var(--tinta);
+  }
+
+  /* La terminal es oscura en ambos temas, como en cualquier editor. */
+  .terminal {
+    --t-fondo: #040816;
+    --t-tinta: #d7e2ff;
+    --t-suave: #8da0c9;
+    --t-verde: #34d399;
+    --t-azul: #8fa9ff;
+    --t-ambar: #fbbf77;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, #7c9bff 30%, transparent);
+    border-radius: var(--radio-tarjeta);
+    background:
+      radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, #1d3fe0 22%, transparent), transparent 60%),
+      var(--t-fondo);
+    color: var(--t-tinta);
+    font-family: var(--mono);
+    font-size: 0.9375rem;
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.4),
+      0 40px 80px -30px color-mix(in srgb, #1d3fe0 60%, transparent);
+  }
+
+  /* Líneas de barrido muy tenues: pantalla de monitor. */
+  .terminal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.018) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+  }
+
+  .terminal__barra {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: var(--e-3) var(--e-4);
+    border-bottom: 1px solid rgb(143 169 255 / 0.15);
+    background: rgb(255 255 255 / 0.03);
+  }
+
+  .terminal__luz {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff6b6b;
+  }
+
+  .terminal__luz:nth-child(2) {
+    background: #fbbf24;
+  }
+
+  .terminal__luz:nth-child(3) {
+    background: #34d399;
+  }
+
+  .terminal__titulo {
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--t-suave);
+    font-size: 0.8125rem;
+  }
+
+  .terminal__salida {
+    height: 22rem;
+    overflow-y: auto;
+    padding: var(--e-4) var(--e-5) 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(143 169 255 / 0.3) transparent;
+    line-height: 1.6;
+  }
+
+  .terminal__salida :global(.linea) {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    animation: aparecer 220ms var(--curva) backwards;
+  }
+
+  /* Líneas con sangría: si el texto se parte, la segunda línea queda alineada con la primera. */
+  .terminal__salida :global(.sangria) {
+    padding-left: 2.5em;
+  }
+
+  .terminal__salida :global(.linea--cmd) {
+    margin-top: var(--e-3);
+    color: var(--t-tinta);
+  }
+
+  .terminal__salida :global(.linea--cmd)::before {
+    content: 'miguel@pasto:~$ ';
+    color: var(--t-verde);
+  }
+
+  .terminal__salida :global(.suave) {
+    color: var(--t-suave);
+  }
+
+  .terminal__salida :global(.verde) {
+    color: var(--t-verde);
+  }
+
+  .terminal__salida :global(.azul) {
+    color: var(--t-azul);
+  }
+
+  .terminal__salida :global(.ambar) {
+    color: var(--t-ambar);
+  }
+
+  .terminal__salida :global(a) {
+    color: var(--t-azul);
+  }
+
+  .terminal__salida :global(.boton-linea) {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--t-azul);
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      translate: 0 4px;
+    }
+  }
+
+  .terminal__entrada {
+    display: flex;
+    align-items: center;
+    gap: var(--e-2);
+    padding: var(--e-3) var(--e-5) var(--e-4);
+  }
+
+  .terminal__prompt {
+    flex-shrink: 0;
+    color: var(--t-verde);
+  }
+
+  .terminal__input {
+    flex: 1;
+    min-width: 0;
+    min-height: 2.25rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--t-tinta);
+    font-family: var(--mono);
+    font-size: 1rem;
+    caret-color: var(--t-verde);
+  }
+
+  .terminal__input::placeholder {
+    color: rgb(141 160 201 / 0.6);
+  }
+
+  .terminal__input:focus {
+    outline: none;
+  }
+
+  .terminal:has(.terminal__input:focus-visible) {
+    border-color: color-mix(in srgb, var(--t-verde) 60%, transparent);
+  }
+
+  .terminal__sugerencias {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+    padding: var(--e-3) var(--e-5) var(--e-5);
+    border-top: 1px solid rgb(143 169 255 / 0.12);
+  }
+
+  .sugerencia {
+    min-height: 2.5rem;
+    padding: var(--e-1) var(--e-3);
+    border: 1px solid rgb(143 169 255 / 0.28);
+    border-radius: 8px;
+    background: rgb(143 169 255 / 0.06);
+    color: var(--t-azul);
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-corta) var(--curva),
+      border-color var(--dur-corta) var(--curva),
+      transform var(--dur-corta) var(--curva);
+  }
+
+  .sugerencia:hover {
+    border-color: var(--t-verde);
+    background: rgb(52 211 153 / 0.1);
+    color: var(--t-verde);
+  }
+
+  .sugerencia:active {
+    transform: scale(0.96);
+  }
+
+  .terminal :focus-visible {
+    outline-color: var(--t-verde);
+  }
+
+  @media (max-width: 55rem) {
+    .consola-seccion {
+      grid-template-columns: 1fr;
+      gap: var(--e-5);
+    }
+
+    .atajos {
+      display: none;
+    }
+
+    .terminal__salida {
+      height: 18rem;
+      padding-inline: var(--e-4);
+    }
+
+    .terminal__entrada,
+    .terminal__sugerencias {
+      padding-inline: var(--e-4);
+    }
+
+    .terminal__prompt span[aria-hidden] {
+      font-size: 0.8125rem;
+    }
+  }
+</style>
+
+<script>
+  import { mostrarAviso } from '@/scripts/aviso';
+
+  type Datos = {
+    perfil: Record<string, string>;
+    proyectos: {
+      id: string;
+      titulo: string;
+      resumen: string;
+      area: string;
+      stack: string[];
+      dorsal: number | null;
+    }[];
+    stack: { enProyectos: string[]; fueraDeProyectos: string[] };
+    trayectoria: { fecha: string; titulo: string }[];
+  };
+
+  /** Un trozo de línea: texto con un color, un enlace o un botón que ejecuta otro comando. */
+  type Trozo = string | { t: string; c?: string; href?: string; cmd?: string };
+
+  const terminal = document.querySelector<HTMLElement>('[data-terminal]');
+  const fuente = document.getElementById('datos-consola');
+
+  if (terminal && fuente) {
+    const datos = JSON.parse(fuente.textContent ?? '{}') as Datos;
+    const salida = terminal.querySelector<HTMLElement>('[data-salida]')!;
+    const forma = terminal.querySelector<HTMLFormElement>('[data-forma]')!;
+    const entrada = terminal.querySelector<HTMLInputElement>('[data-comando]')!;
+    const { perfil, proyectos, stack } = datos;
+
+    const historial: string[] = [];
+    let posHistorial = 0;
+
+    /** Escribe una línea. Todo entra como texto (textContent): nada de HTML del usuario en la página. */
+    function linea(trozos: Trozo[] | string, clase = '') {
+      const p = document.createElement('p');
+      p.className = `linea ${clase}`.trim();
+      (typeof trozos === 'string' ? [trozos] : trozos).forEach((tr) => {
+        if (typeof tr === 'string') {
+          p.append(tr);
+          return;
+        }
+        let el: HTMLElement;
+        if (tr.href) {
+          el = document.createElement('a');
+          (el as HTMLAnchorElement).href = tr.href;
+          if (tr.href.startsWith('http')) {
+            (el as HTMLAnchorElement).target = '_blank';
+            (el as HTMLAnchorElement).rel = 'noopener';
+          }
+        } else if (tr.cmd) {
+          el = document.createElement('button');
+          (el as HTMLButtonElement).type = 'button';
+          el.className = 'boton-linea';
+          el.dataset.sugerencia = tr.cmd;
+        } else {
+          el = document.createElement('span');
+        }
+        if (tr.c) el.classList.add(tr.c);
+        el.textContent = tr.t;
+        p.append(el);
+      });
+      salida.append(p);
+      salida.scrollTop = salida.scrollHeight;
+    }
+
+    const vacia = () => linea(' ');
+
+    const buscarProyecto = (texto: string) => {
+      const q = texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      return proyectos.find(
+        (p) =>
+          p.id === q ||
+          String(p.dorsal) === q ||
+          p.titulo.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').startsWith(q),
+      );
+    };
+
+    const comandos: Record<string, { ayuda: string; ejecutar: (args: string[]) => void }> = {
+      ayuda: {
+        ayuda: 'Lista los comandos disponibles',
+        ejecutar: () => {
+          linea('Comandos disponibles:', 'verde');
+          Object.entries(comandos).forEach(([nombre, c]) =>
+            linea([
+              { t: nombre.padEnd(11), cmd: nombre },
+              { t: ` ${c.ayuda}`, c: 'suave' },
+            ]),
+          );
+          vacia();
+          linea([{ t: 'Toca un comando para ejecutarlo.', c: 'suave' }]);
+        },
+      },
+      sobre: {
+        ayuda: 'Quién soy, en tres líneas',
+        ejecutar: () => {
+          linea([{ t: perfil.nombre!, c: 'verde' }]);
+          linea(`${perfil.rol} · ${perfil.semestre} · ${perfil.ciudad}`);
+          linea(`${perfil.queHago} ${perfil.disponibilidad}`);
+          linea([{ t: `Me gradúo en ${perfil.grado} (fecha estimada).`, c: 'suave' }]);
+        },
+      },
+      proyectos: {
+        ayuda: 'Los proyectos, con su dorsal en la cancha',
+        ejecutar: () => {
+          proyectos.forEach((p) => {
+            linea([
+              { t: `#${String(p.dorsal ?? '-').padEnd(3)}`, c: 'ambar' },
+              { t: p.titulo, cmd: `abrir ${p.id}` },
+              { t: `  ${p.area}`, c: 'suave' },
+            ]);
+            linea([{ t: p.resumen, c: 'suave' }], 'sangria');
+          });
+          vacia();
+          linea([
+            { t: 'Usa ', c: 'suave' },
+            { t: 'abrir <nombre>', c: 'azul' },
+            { t: ' o toca un título.', c: 'suave' },
+          ]);
+        },
+      },
+      abrir: {
+        ayuda: 'Abre un proyecto: abrir hp, abrir 9…',
+        ejecutar: (args) => {
+          const p = args[0] ? buscarProyecto(args.join(' ')) : undefined;
+          if (!p) {
+            linea([
+              { t: 'No encontré ese proyecto. Prueba: ', c: 'ambar' },
+              ...proyectos.map((x) => ({ t: `${x.id} `, cmd: `abrir ${x.id}` })),
+            ]);
+            return;
+          }
+          linea([{ t: `Abriendo ${p.titulo}…`, c: 'verde' }]);
+          linea([{ t: `Stack: ${p.stack.join(', ')}`, c: 'suave' }]);
+          window.setTimeout(() => (window.location.href = `/proyectos/${p.id}`), 700);
+        },
+      },
+      stack: {
+        ayuda: 'Tecnologías, contadas por evidencia',
+        ejecutar: () => {
+          linea([{ t: 'Usadas en los proyectos publicados:', c: 'verde' }]);
+          linea(stack.enProyectos.join(' · '), 'sangria');
+          linea([{ t: 'También las he usado:', c: 'verde' }]);
+          linea(stack.fueraDeProyectos.join(' · '), 'sangria');
+          vacia();
+          linea([
+            { t: 'Filtra un proyecto por tecnología con ', c: 'suave' },
+            { t: 'usa <tecnología>', c: 'azul' },
+          ]);
+        },
+      },
+      usa: {
+        ayuda: 'Qué proyectos usan una tecnología: usa react',
+        ejecutar: (args) => {
+          const q = args.join(' ').toLowerCase();
+          if (!q) {
+            linea([
+              { t: 'Dime una tecnología. Ejemplo: ', c: 'ambar' },
+              { t: 'usa supabase', cmd: 'usa supabase' },
+            ]);
+            return;
+          }
+          const usan = proyectos.filter((p) => p.stack.some((s) => s.toLowerCase().includes(q)));
+          if (usan.length === 0) {
+            linea([{ t: `Ningún proyecto publicado usa «${args.join(' ')}».`, c: 'ambar' }]);
+            return;
+          }
+          linea([
+            {
+              t: `${usan.length} ${usan.length === 1 ? 'proyecto usa' : 'proyectos usan'} «${args.join(' ')}»:`,
+              c: 'verde',
+            },
+          ]);
+          usan.forEach((p) => linea(['  → ', { t: p.titulo, cmd: `abrir ${p.id}` }]));
+        },
+      },
+      trayectoria: {
+        ayuda: 'Mi camino, de lo más reciente a lo más antiguo',
+        ejecutar: () =>
+          datos.trayectoria.forEach((t) => linea([{ t: t.fecha.padEnd(26), c: 'ambar' }, t.titulo])),
+      },
+      contacto: {
+        ayuda: 'Cómo escribirme',
+        ejecutar: () => {
+          linea(['email     ', { t: perfil.email!, href: `mailto:${perfil.email}` }]);
+          linea(['github    ', { t: perfil.github!.replace('https://', ''), href: perfil.github! }]);
+          linea(['linkedin  ', { t: 'Miguel Ángel Pantoja Guerra', href: perfil.linkedin! }]);
+          vacia();
+          linea([
+            { t: 'O usa el ', c: 'suave' },
+            { t: 'formulario', href: '#contacto' },
+            { t: ' aquí abajo.', c: 'suave' },
+          ]);
+        },
+      },
+      copiar: {
+        ayuda: 'Copia mi email al portapapeles',
+        ejecutar: () => {
+          navigator.clipboard
+            ?.writeText(perfil.email!)
+            .then(() => {
+              linea([{ t: `✓ ${perfil.email} copiado.`, c: 'verde' }]);
+              mostrarAviso('Email copiado.', 'exito');
+            })
+            .catch(() => linea([{ t: `No pude copiar. Aquí está: ${perfil.email}`, c: 'ambar' }]));
+        },
+      },
+      cv: {
+        ayuda: 'Abre mi hoja de vida',
+        ejecutar: () => {
+          linea([{ t: 'Abriendo el CV…', c: 'verde' }]);
+          window.setTimeout(() => (window.location.href = '/cv'), 500);
+        },
+      },
+      tema: {
+        ayuda: 'Cambia el tema: tema dia | tema noche',
+        ejecutar: (args) => {
+          const t = (args[0] ?? '').replace('í', 'i');
+          if (t !== 'dia' && t !== 'noche') {
+            linea([
+              { t: 'Usa ', c: 'ambar' },
+              { t: 'tema dia', cmd: 'tema dia' },
+              { t: ' o ', c: 'ambar' },
+              { t: 'tema noche', cmd: 'tema noche' },
+            ]);
+            return;
+          }
+          document.dispatchEvent(new CustomEvent('portafolio:tema', { detail: t }));
+          linea([{ t: `Tema ${t === 'dia' ? 'Día' : 'Noche'} aplicado.`, c: 'verde' }]);
+        },
+      },
+      gol: {
+        ayuda: '¿Qué será?',
+        ejecutar: () => {
+          linea([{ t: '⚽  ¡GOOOOOL!', c: 'verde' }]);
+          document.dispatchEvent(new CustomEvent('portafolio:gol'));
+        },
+      },
+      limpiar: {
+        ayuda: 'Limpia la pantalla (o Ctrl + L)',
+        ejecutar: () => salida.replaceChildren(),
+      },
+    };
+
+    const alias: Record<string, string> = {
+      help: 'ayuda',
+      '?': 'ayuda',
+      ls: 'proyectos',
+      whoami: 'sobre',
+      clear: 'limpiar',
+      cls: 'limpiar',
+      open: 'abrir',
+      cd: 'abrir',
+      email: 'contacto',
+    };
+
+    function ejecutar(texto: string) {
+      const limpio = texto.trim();
+      linea(limpio, 'linea--cmd');
+      if (!limpio) return;
+      historial.push(limpio);
+      posHistorial = historial.length;
+      const [primero = '', ...args] = limpio.split(/\s+/);
+      const nombre = alias[primero.toLowerCase()] ?? primero.toLowerCase();
+      if (nombre === 'sudo') {
+        linea([
+          { t: 'Buen intento. Aquí no hay permisos de administrador, pero sí ', c: 'ambar' },
+          { t: 'contacto', cmd: 'contacto' },
+        ]);
+        return;
+      }
+      const comando = comandos[nombre];
+      if (!comando) {
+        linea([
+          { t: `${primero}: comando no encontrado. Escribe `, c: 'ambar' },
+          { t: 'ayuda', cmd: 'ayuda' },
+        ]);
+        return;
+      }
+      comando.ejecutar(args.map((a) => a.toLowerCase()));
+    }
+
+    forma.addEventListener('submit', (e) => {
+      e.preventDefault();
+      ejecutar(entrada.value);
+      entrada.value = '';
+    });
+
+    entrada.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' && historial.length) {
+        e.preventDefault();
+        posHistorial = Math.max(posHistorial - 1, 0);
+        entrada.value = historial[posHistorial] ?? '';
+      } else if (e.key === 'ArrowDown' && historial.length) {
+        e.preventDefault();
+        posHistorial = Math.min(posHistorial + 1, historial.length);
+        entrada.value = historial[posHistorial] ?? '';
+      } else if (e.key === 'Tab' && entrada.value.trim()) {
+        // Completa el nombre del comando; si no hay a qué completar, Tab sale del campo como siempre.
+        const parcial = entrada.value.trim().toLowerCase();
+        const opciones = Object.keys(comandos).filter((c) => c.startsWith(parcial));
+        if (opciones.length === 1) {
+          e.preventDefault();
+          entrada.value = `${opciones[0]} `;
+        } else if (opciones.length > 1) {
+          e.preventDefault();
+          linea(opciones.join('   '), 'suave');
+        }
+      } else if (e.key.toLowerCase() === 'l' && e.ctrlKey) {
+        e.preventDefault();
+        salida.replaceChildren();
+      }
+    });
+
+    // Sugerencias y comandos dentro de la salida: ejecutan sin teclear.
+    terminal.addEventListener('click', (e) => {
+      const boton = (e.target as HTMLElement).closest<HTMLElement>('[data-sugerencia]');
+      if (boton) ejecutar(boton.dataset.sugerencia ?? '');
+    });
+
+    // Clic en la pantalla de la terminal (no en un enlace o botón): el foco va al campo, como en una terminal real.
+    salida.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a, button') || window.getSelection()?.toString()) return;
+      entrada.focus({ preventScroll: true });
+    });
+
+    // Bienvenida.
+    linea([
+      { t: 'Portafolio de Miguel Pantoja', c: 'verde' },
+      { t: ' · v2026.11', c: 'suave' },
+    ]);
+    linea([
+      { t: 'Escribe ', c: 'suave' },
+      { t: 'ayuda', cmd: 'ayuda' },
+      { t: ' para ver los comandos, o prueba ', c: 'suave' },
+      { t: 'proyectos', cmd: 'proyectos' },
+      { t: '.', c: 'suave' },
+    ]);
+  }
+</script>

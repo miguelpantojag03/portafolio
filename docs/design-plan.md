@@ -1,4 +1,4 @@
-# Plan de diseño: Cancha
+# Plan de diseño: Cancha de noche
 
 Portafolio de Miguel Ángel Pantoja Guerra, estudiante de Ingeniería de Software en Pasto, Colombia.
 
@@ -6,7 +6,8 @@ Portafolio de Miguel Ángel Pantoja Guerra, estudiante de Ingeniería de Softwar
 
 1. **Negros y Blancos** (primera versión): el carnaval de Pasto, con un hero partido en negro y blanco. Miguel la descartó por "muy básica".
 2. **Carroza**: magenta, amarillo y violeta del carnaval. Descartada: "los colores están muy feos".
-3. **Cancha** (actual): Miguel pidió el azul como color principal, el verde como segundo y un sitio mucho más interactivo.
+3. **Cancha**: Miguel pidió el azul como color principal, el verde como segundo y un sitio mucho más interactivo.
+4. **Cancha de noche** (actual): Miguel pidió colores más oscuros, una interfaz más bonita y más didáctica, y que el JavaScript luciera. El tema oscuro pasa a ser el predeterminado (azul casi negro `#050B1C`), con superficies de vidrio, el degradado azul → verde como firma y dos secciones nuevas para aprender jugando: «Cómo viaja un dato» y la terminal.
 
 De las versiones anteriores quedan la tipografía, la retícula, la escritura y el sistema de componentes. Cambiaron el color y el hero.
 
@@ -22,6 +23,9 @@ Miguel juega y ve fútbol, y se define como full stack: sabe un poco de todo y c
 ## Tokens
 
 ### Color
+
+Noche es el tema predeterminado: fondo `#050B1C`, superficies `#0C1838` / `#12214A`, vidrio translúcido con borde fino (`--borde`), degradado `--degradado` (#7C9BFF → #34D399) para el nombre, el botón principal y los acentos. Día se conserva como opción en el selector. La tabla de abajo sigue valiendo para los textos y la acción.
+
 
 | Token | Día | Noche | Rol | Contraste |
 |---|---|---|---|---|
@@ -71,11 +75,16 @@ Escala de cuarta justa (1,333) desde 17 px. Medida del texto: 64ch.
 | Barrido de tarjetas | La tarjeta se llena de azul al pasar o al enfocar | También con `:focus-within` |
 | Trayectoria con scroll | La línea se enciende al bajar | Mejora progresiva (`animation-timeline: view()`) |
 | Escribir «gol» | El balón entra al arco | Sorpresa; avisa también con texto |
+| «Cómo viaja un dato» | Las cuatro capas de cada proyecto; un paquete de luz las recorre paso a paso | Botones reales (proyecto, anterior, play, siguiente) y región `aria-live` que lee cada paso. Sin JS: listas ordenadas |
+| Terminal | Comandos (`ayuda`, `proyectos`, `usa react`, `abrir kalma`, `tema dia`…) con historial y Tab | Campo con etiqueta, salida `role="log"` y sugerencias que se tocan sin teclear. Requiere JS: sin él no se muestra |
+| Línea que se escribe sola | Qué construyo, un ejemplo por proyecto | Decorativa (`aria-hidden`) |
+| Marcador que cuenta | Los números del hero suben desde cero | El valor final está en el HTML |
+| Foco, imán e inclinación | Luz de fondo que sigue al puntero, botones que se acercan y tarjetas que se inclinan 4° | Solo con puntero fino y sin movimiento reducido |
 
 ## Mapa del sitio
 
 ```
-/                      Inicio: hero con cancha, proyectos, cómo trabajo, sobre mí, trayectoria, contacto
+/                      Inicio: hero con cancha, proyectos, cómo viaja un dato, cómo trabajo, sobre mí, trayectoria, terminal, contacto
 /proyectos/[slug]      Caso de estudio (hp, prestalab, ascua, kalma)
 /cv                    CV en HTML, listo para imprimir
 /mensaje-enviado       Resultado del formulario sin JavaScript
