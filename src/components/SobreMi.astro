@@ -65,7 +65,9 @@ import { ahoraMismo, historia } from '@/data/perfil';
     aspect-ratio: 3 / 4;
     object-fit: cover;
     border-radius: var(--radio-imagen);
-    box-shadow: 12px 12px 0 var(--azul);
+    box-shadow:
+      12px 12px 0 var(--azul),
+      0 30px 60px -20px color-mix(in srgb, var(--accion) 60%, transparent);
   }
 
   .sobre__texto {
@@ -86,13 +88,39 @@ import { ahoraMismo, historia } from '@/data/perfil';
   .ahora {
     grid-area: ahora;
     padding: var(--e-5);
-    background: var(--verde-vivo);
+    border: 1px solid color-mix(in srgb, var(--resalte) 45%, transparent);
+    background:
+      radial-gradient(
+        120% 90% at 0% 0%,
+        color-mix(in srgb, var(--resalte) 18%, transparent),
+        transparent 60%
+      ),
+      var(--vidrio);
     border-radius: var(--radio-tarjeta);
-    color: var(--azul-noche);
+    box-shadow: 0 20px 50px -28px color-mix(in srgb, var(--resalte) 70%, transparent);
   }
 
-  .ahora .ahora__fecha {
-    color: var(--azul-noche);
+  /* Punto que late: esto es lo único «en vivo» del sitio. */
+  .ahora__titulo::before {
+    content: '';
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-right: var(--e-2);
+    border-radius: 50%;
+    background: var(--resalte);
+    vertical-align: 0.15em;
+    animation: en-vivo 2s ease-out infinite;
+  }
+
+  @keyframes en-vivo {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--resalte) 70%, transparent);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 10px transparent;
+    }
   }
 
   .ahora__titulo {

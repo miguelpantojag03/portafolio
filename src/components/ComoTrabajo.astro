@@ -33,8 +33,11 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
     </h2>
 
     <ul class="habitos" role="list">
-      {formaDeTrabajo.map((h) => (
-        <li class="revelar">
+      {formaDeTrabajo.map((h, i) => (
+        <li class="habito vidrio revelar">
+          <span class="habito__num" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
           <h3 class="habito__titulo">{h.titulo}</h3>
           <p class="texto-suave">{h.texto}</p>
         </li>
@@ -77,10 +80,39 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
   .habitos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    gap: var(--e-6) var(--e-7);
+    gap: var(--e-4);
     list-style: none;
     padding: 0;
     margin-bottom: var(--e-9);
+  }
+
+  .habito {
+    position: relative;
+    overflow: hidden;
+    padding: var(--e-6) var(--e-5) var(--e-5);
+    border-radius: var(--radio-tarjeta);
+    transition:
+      border-color var(--dur-media) var(--curva),
+      box-shadow var(--dur-media) var(--curva);
+  }
+
+  .habito:hover {
+    border-color: color-mix(in srgb, var(--accion) 55%, transparent);
+    box-shadow: var(--brillo);
+  }
+
+  /* Número grande y con degradado, como el dorsal de un hábito. */
+  .habito__num {
+    display: block;
+    margin-bottom: var(--e-3);
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-stretch: 125%;
+    line-height: 1;
+    background: var(--degradado);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .habito__titulo {
@@ -116,7 +148,8 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
     list-style: none;
     padding: 0;
     margin-top: var(--e-5);
-    border-top: var(--trazo) solid var(--tinta);
+    border-top: var(--trazo) solid transparent;
+    border-image: var(--degradado) 1;
   }
 
   .fila {
@@ -124,7 +157,12 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--e-4);
     padding-block: var(--e-3);
-    border-bottom: 1px solid var(--tinta-suave);
+    border-bottom: 1px solid var(--borde);
+    transition: background-color var(--dur-corta) var(--curva);
+  }
+
+  .fila:hover {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accion) 10%, transparent), transparent);
   }
 
   .fila__nombre {
