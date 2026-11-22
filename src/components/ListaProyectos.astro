@@ -482,6 +482,93 @@ const tecnologiasDe = (slug: string) =>
       right: 50%;
     }
   }
+
+  /*
+   * Vitrina bento: dos columnas, la captura arriba y el texto abajo.
+   * Va al final para mandar sobre el diseño anterior de una sola columna.
+   */
+  .proyectos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-5);
+  }
+
+  .proyecto {
+    grid-template-columns: 1fr;
+    align-content: start;
+    align-items: start;
+    gap: var(--e-5);
+    padding: var(--e-3) var(--e-3) var(--e-6);
+  }
+
+  .proyecto__lado {
+    order: -1;
+    position: relative;
+    justify-items: stretch;
+  }
+
+  /* La etiqueta del puesto flota sobre la captura. */
+  .proyecto__area {
+    position: absolute;
+    top: var(--e-3);
+    left: var(--e-3);
+    z-index: 1;
+    border-color: var(--borde-fuerte);
+    background: color-mix(in srgb, var(--fondo) 78%, transparent);
+    backdrop-filter: blur(10px);
+    font-size: 0.8125rem;
+  }
+
+  .proyecto__imagen,
+  .proyecto:hover .proyecto__imagen {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 16px;
+    transform: none;
+  }
+
+  .proyecto__imagen {
+    transition:
+      scale 600ms var(--curva),
+      filter var(--dur-media) var(--curva);
+  }
+
+  .proyecto:hover .proyecto__imagen {
+    scale: 1.025;
+  }
+
+  .proyecto__texto {
+    padding-inline: var(--e-4);
+  }
+
+  .proyecto__nombre {
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  }
+
+  .proyecto__resumen {
+    margin-top: var(--e-3);
+    font-size: 1.0625rem;
+    color: var(--tinta-suave);
+    transition: color var(--dur-media) var(--curva);
+  }
+
+  .proyecto:hover .proyecto__resumen,
+  .proyecto:focus-within .proyecto__resumen {
+    color: var(--hielo);
+  }
+
+  .proyecto__dorsal,
+  .proyecto:hover .proyecto__dorsal {
+    top: auto;
+    right: var(--e-4);
+    bottom: -0.12em;
+    font-size: clamp(5rem, 8vw, 7.5rem);
+  }
+
+  @media (max-width: 55rem) {
+    .proyectos {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
 <script>

@@ -144,29 +144,62 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
     font-size: 0.9375rem;
   }
 
+  /* Mosaico: cada tecnología es una ficha con el proyecto donde se ve. */
   .tabla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+    gap: var(--e-3);
     list-style: none;
     padding: 0;
     margin-top: var(--e-5);
-    border-top: var(--trazo) solid transparent;
-    border-image: var(--degradado) 1;
   }
 
   .fila {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--e-4);
-    padding-block: var(--e-3);
-    border-bottom: 1px solid var(--borde);
-    transition: background-color var(--dur-corta) var(--curva);
+    align-content: start;
+    gap: var(--e-1);
+    padding: var(--e-4);
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    background: var(--vidrio);
+    transition:
+      border-color var(--dur-media) var(--curva),
+      translate var(--dur-media) var(--curva),
+      box-shadow var(--dur-media) var(--curva);
   }
 
   .fila:hover {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--accion) 10%, transparent), transparent);
+    border-color: color-mix(in srgb, var(--accion) 55%, transparent);
+    box-shadow: var(--brillo);
+    translate: 0 -3px;
   }
 
+  /* Un punto de color: verde si se ve en un proyecto publicado. */
   .fila__nombre {
-    font-weight: 650;
+    display: flex;
+    align-items: center;
+    gap: var(--e-2);
+    font-weight: 700;
+  }
+
+  .fila__nombre::before {
+    content: '';
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--tinta-suave);
+  }
+
+  #grupo-en-proyectos ~ .tabla .fila__nombre::before {
+    background: var(--resalte);
+    box-shadow: 0 0 10px var(--resalte);
+  }
+
+  .fila__donde {
+    padding-left: calc(0.5rem + var(--e-2));
+    font-size: 0.875rem;
   }
 
   .fila__donde a {
@@ -181,13 +214,6 @@ const grupos: { id: string; titulo: string; nota: string; items: Tecnologia[] }[
   @media (max-width: 55rem) {
     .tecnologias {
       grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 30rem) {
-    .fila {
-      grid-template-columns: 1fr;
-      gap: var(--e-1);
     }
   }
 </style>

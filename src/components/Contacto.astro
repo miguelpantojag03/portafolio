@@ -171,6 +171,11 @@ const enlaces = [
     font-stretch: 105%;
     font-weight: 750;
     overflow-wrap: anywhere;
+    background: var(--degradado);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-decoration-color: color-mix(in srgb, var(--accion) 60%, transparent);
   }
 
   .redes {
@@ -189,9 +194,10 @@ const enlaces = [
     gap: var(--e-4);
     min-height: 4.5rem;
     padding: var(--e-3) var(--e-5) var(--e-3) var(--e-3);
-    border: var(--trazo) solid transparent;
+    border: 1px solid var(--borde);
     border-radius: var(--radio-tarjeta);
-    background: var(--superficie);
+    background: var(--vidrio);
+    backdrop-filter: blur(12px);
     text-decoration: none;
     transition:
       transform var(--dur-media) var(--curva-rebote),
@@ -253,12 +259,25 @@ const enlaces = [
     transform: translate(3px, -3px);
   }
 
+  /* Borde degradado de 1 px: fondo de vidrio encima de un fondo degradado recortado al borde. */
   .formulario {
     display: grid;
     gap: var(--e-5);
     padding: var(--e-6);
+    border: 1px solid transparent;
     border-radius: var(--radio-tarjeta);
-    background: var(--superficie);
+    background:
+      linear-gradient(var(--superficie), color-mix(in srgb, var(--superficie) 85%, var(--fondo))) padding-box,
+      linear-gradient(
+          140deg,
+          color-mix(in srgb, var(--accion) 70%, transparent),
+          var(--borde) 40%,
+          color-mix(in srgb, var(--resalte) 60%, transparent)
+        )
+        border-box;
+    box-shadow:
+      var(--sombra),
+      0 0 80px -40px color-mix(in srgb, var(--accion) 60%, transparent);
   }
 
   .formulario__titulo {
@@ -281,10 +300,26 @@ const enlaces = [
     width: 100%;
     min-height: 2.75rem;
     padding: var(--e-3) var(--e-4);
-    border: var(--trazo) solid var(--tinta);
+    border: 1px solid var(--borde-fuerte);
     border-radius: var(--radio-imagen);
-    background: var(--fondo);
+    background: color-mix(in srgb, var(--fondo) 70%, transparent);
     line-height: 1.5;
+    transition:
+      border-color var(--dur-corta) var(--curva),
+      box-shadow var(--dur-corta) var(--curva),
+      background-color var(--dur-corta) var(--curva);
+  }
+
+  .campo input:hover,
+  .campo textarea:hover {
+    border-color: color-mix(in srgb, var(--accion) 50%, transparent);
+  }
+
+  .campo input:focus,
+  .campo textarea:focus {
+    border-color: var(--accion);
+    background: var(--fondo);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accion) 22%, transparent);
   }
 
   .campo textarea {
@@ -298,7 +333,8 @@ const enlaces = [
 
   .campo [aria-invalid='true'] {
     border-color: var(--error);
-    border-width: 3px;
+    border-width: 2px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--error) 18%, transparent);
   }
 
   .campo__ayuda {

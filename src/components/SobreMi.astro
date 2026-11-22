@@ -55,8 +55,39 @@ import { ahoraMismo, historia } from '@/data/perfil';
     grid-area: titulo;
   }
 
+  /* Marco con el degradado de la marca (borde de 3 px) y un halo detrás. */
   .sobre__foto {
     grid-area: foto;
+    position: relative;
+    padding: 3px;
+    border-radius: calc(var(--radio-imagen) + 6px);
+    background: var(--degradado);
+    box-shadow: 0 30px 70px -25px color-mix(in srgb, var(--accion) 70%, transparent);
+    rotate: -2deg;
+    transition: rotate 600ms var(--curva-rebote);
+  }
+
+  .sobre__foto:hover {
+    rotate: 0deg;
+  }
+
+  .sobre__foto::after {
+    content: '10';
+    content: '10' / '';
+    position: absolute;
+    right: -0.9rem;
+    bottom: -0.9rem;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    border: 3px solid var(--fondo);
+    background: var(--degradado);
+    color: var(--sobre-accion);
+    font-weight: 900;
+    font-stretch: 125%;
+    box-shadow: 0 10px 24px -8px rgb(0 0 0 / 0.6);
   }
 
   /* La foto lleva un bloque azul detrás, corrido, como una camiseta colgada. */
@@ -64,10 +95,7 @@ import { ahoraMismo, historia } from '@/data/perfil';
     width: 100%;
     aspect-ratio: 3 / 4;
     object-fit: cover;
-    border-radius: var(--radio-imagen);
-    box-shadow:
-      12px 12px 0 var(--azul),
-      0 30px 60px -20px color-mix(in srgb, var(--accion) 60%, transparent);
+    border-radius: calc(var(--radio-imagen) + 3px);
   }
 
   .sobre__texto {

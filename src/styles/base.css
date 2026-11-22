@@ -119,11 +119,11 @@ pre {
 }
 
 .titulo-seccion {
-  font-size: var(--t-4);
-  font-stretch: 115%;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.01em;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-stretch: 118%;
+  font-weight: 850;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
   margin-bottom: var(--e-7);
 }
 
@@ -367,10 +367,18 @@ main {
 
 .seccion .titulo-seccion::before {
   counter-increment: seccion;
-  content: '0' counter(seccion) ' /';
-  content: '0' counter(seccion) ' /' / '';
-  display: block;
-  margin-bottom: var(--e-3);
+  content: '0' counter(seccion);
+  content: '0' counter(seccion) / '';
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  width: fit-content;
+  margin-bottom: var(--e-4);
+  padding: 4px 12px 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--resalte) 40%, transparent);
+  border-radius: var(--radio-boton);
+  background: color-mix(in srgb, var(--resalte) 10%, transparent);
+  box-shadow: 0 0 24px -6px color-mix(in srgb, var(--resalte) 50%, transparent);
   font-family: var(--mono);
   font-size: 0.875rem;
   font-weight: 600;

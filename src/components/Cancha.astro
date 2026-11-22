@@ -141,9 +141,23 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
     border-radius: var(--radio-tarjeta);
     overflow: hidden;
     box-shadow:
-      0 0 0 6px var(--superficie),
-      0 30px 60px -30px color-mix(in srgb, var(--azul) 60%, transparent);
+      0 0 0 1px color-mix(in srgb, var(--cal) 30%, transparent),
+      0 0 0 8px color-mix(in srgb, var(--fondo) 70%, transparent),
+      0 0 0 9px var(--borde-fuerte),
+      0 40px 90px -30px color-mix(in srgb, var(--verde-vivo) 45%, transparent);
     touch-action: none;
+  }
+
+  /* Luz de reflector que cae sobre la cancha desde arriba, y viñeta en los bordes. */
+  .cancha::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      radial-gradient(80% 45% at 50% 0%, rgb(230 238 255 / 0.18), transparent 70%),
+      radial-gradient(130% 100% at 50% 50%, transparent 55%, rgb(3 8 22 / 0.55));
+    pointer-events: none;
   }
 
   .cancha__lineas {
@@ -177,6 +191,7 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
 
   /* Posiciones: botones circulares con su nombre debajo. */
   .posicion {
+    z-index: 2;
     position: absolute;
     display: grid;
     justify-items: center;
@@ -271,7 +286,7 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
     cursor: grab;
     user-select: none;
     box-shadow: 0 8px 18px -6px rgb(8 22 52 / 0.6);
-    z-index: 2;
+    z-index: 3;
   }
 
   .jugador:active,
@@ -292,7 +307,7 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
     background: radial-gradient(circle at 35% 35%, var(--hielo), var(--cal) 60%, #7fa695);
     transform: translate(-50%, -50%);
     opacity: 0;
-    z-index: 3;
+    z-index: 4;
     pointer-events: none;
   }
 
@@ -301,7 +316,10 @@ const pct = (x: number, y: number) => `left:${x}%;top:${(y / 140) * 100}%`;
     gap: var(--e-1);
     padding: var(--e-5);
     border-radius: var(--radio-tarjeta);
-    background: var(--superficie);
+    border: 1px solid var(--borde);
+    background: var(--vidrio);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--sombra);
   }
 
   .jugada__puesto {
