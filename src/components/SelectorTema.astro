@@ -1,85 +1,129 @@
 ---
-/** Selector de tema: Día (azul hielo) y Noche (azul noche). */
+/** Selector de tema: Noche (predeterminado, azul casi negro) y Día (azul hielo). */
 ---
 
-<div class="tema requiere-js" role="group" aria-labelledby="tema-etiqueta">
+<div class="tema requiere-js" role="group" aria-labelledby="tema-etiqueta" data-tema-grupo>
   <span id="tema-etiqueta" class="solo-lectores">
     Tema de color
   </span>
-  <button type="button" class="tema__opcion" data-tema-opcion="dia" aria-pressed="false">
-    Día
-  </button>
+  <span class="tema__ficha" aria-hidden="true"></span>
   <button type="button" class="tema__opcion" data-tema-opcion="noche" aria-pressed="false">
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">
+      <path d="M13.5 10.2A6 6 0 0 1 5.8 2.5a6 6 0 1 0 7.7 7.7Z" fill="currentColor"></path>
+    </svg>
     Noche
+  </button>
+  <button type="button" class="tema__opcion" data-tema-opcion="dia" aria-pressed="false">
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="3.2" fill="currentColor"></circle>
+      <path
+        d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6 13 13M3 13l1.4-1.4M11.6 4.4 13 3"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      ></path>
+    </svg>
+    Día
   </button>
 </div>
 
 <style>
   .tema {
-    display: inline-flex;
-    padding: 3px;
-    border: var(--trazo) solid var(--tinta);
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 4px;
+    border: 1px solid var(--borde-fuerte);
     border-radius: var(--radio-boton);
+    background: var(--vidrio);
+  }
+
+  /* La ficha resaltada se desliza bajo la opción elegida. */
+  .tema__ficha {
+    position: absolute;
+    inset: 4px auto 4px 4px;
+    width: calc(50% - 4px);
+    border-radius: var(--radio-boton);
+    background: var(--degradado);
+    box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accion) 80%, transparent);
+    transition: translate var(--dur-media) var(--curva-rebote);
+  }
+
+  .tema[data-actual='dia'] .tema__ficha {
+    translate: 100% 0;
   }
 
   .tema__opcion {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     min-height: 2.5rem;
     min-width: 2.75rem;
     padding: var(--e-1) var(--e-4);
     border: 0;
     border-radius: var(--radio-boton);
     background: transparent;
-    font-weight: 600;
+    color: var(--tinta-suave);
+    font-weight: 650;
     font-size: 0.9375rem;
     cursor: pointer;
-    transition:
-      background-color var(--dur-corta) var(--curva),
-      color var(--dur-corta) var(--curva);
+    transition: color var(--dur-media) var(--curva);
   }
 
   .tema__opcion[aria-pressed='true'] {
-    background: var(--tinta);
-    color: var(--fondo);
+    color: var(--sobre-accion);
   }
 
   .tema__opcion:not([aria-pressed='true']):hover {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.2em;
+    color: var(--tinta);
+  }
+
+  @media (forced-colors: active) {
+    .tema__opcion[aria-pressed='true'] {
+      outline: 2px solid ButtonText;
+    }
   }
 </style>
 
 <script>
   type Tema = 'dia' | 'noche';
   const raiz = document.documentElement;
-  const oscuroSistema = window.matchMedia('(prefers-color-scheme: dark)');
 
-  const temaActual = (): Tema =>
-    (raiz.dataset.tema as Tema | undefined) ?? (oscuroSistema.matches ? 'noche' : 'dia');
+  // Noche es el predeterminado: Día solo si la persona lo eligió.
+  const temaActual = (): Tema => (raiz.dataset.tema === 'dia' ? 'dia' : 'noche');
 
   function pintarBotones() {
     const actual = temaActual();
     document.querySelectorAll<HTMLButtonElement>('[data-tema-opcion]').forEach((b) => {
       b.setAttribute('aria-pressed', String(b.dataset.temaOpcion === actual));
     });
+    document.querySelectorAll<HTMLElement>('[data-tema-grupo]').forEach((g) => (g.dataset.actual = actual));
     document
       .querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
-      .forEach((m) => m.setAttribute('content', actual === 'noche' ? '#081634' : '#e6eeff'));
+      .forEach((m) => m.setAttribute('content', actual === 'noche' ? '#050b1c' : '#e6eeff'));
+  }
+
+  function aplicar(tema: Tema) {
+    raiz.dataset.tema = tema;
+    try {
+      localStorage.setItem('tema', tema);
+    } catch {
+      // Sin almacenamiento (modo privado estricto): el tema dura lo que dure la página.
+    }
+    pintarBotones();
   }
 
   document.querySelectorAll<HTMLButtonElement>('[data-tema-opcion]').forEach((boton) => {
-    boton.addEventListener('click', () => {
-      const tema = boton.dataset.temaOpcion as Tema;
-      raiz.dataset.tema = tema;
-      try {
-        localStorage.setItem('tema', tema);
-      } catch {
-        // Sin almacenamiento (modo privado estricto): el tema dura lo que dure la página.
-      }
-      pintarBotones();
-    });
+    boton.addEventListener('click', () => aplicar(boton.dataset.temaOpcion as Tema));
   });
 
-  oscuroSistema.addEventListener('change', pintarBotones);
+  // La consola también puede cambiar el tema («tema dia»).
+  document.addEventListener('portafolio:tema', (e) => {
+    const tema = (e as CustomEvent<Tema>).detail;
+    if (tema === 'dia' || tema === 'noche') aplicar(tema);
+  });
+
   pintarBotones();
 </script>

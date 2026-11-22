@@ -43,9 +43,8 @@ const imagenAbsoluta = new URL(imagen, Astro.site);
     <link rel="canonical" href={canonica} />
     {noIndexar && <meta name="robots" content="noindex" />}
 
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#e6eeff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#081634" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#050b1c" />
 
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -84,6 +83,14 @@ const imagenAbsoluta = new URL(imagen, Astro.site);
     </script>
   </head>
   <body>
+    <div class="ambiente" aria-hidden="true" data-ambiente>
+      <div class="ambiente__aurora ambiente__aurora--azul"></div>
+      <div class="ambiente__aurora ambiente__aurora--verde"></div>
+      <div class="ambiente__aurora ambiente__aurora--indigo"></div>
+      <div class="ambiente__rejilla"></div>
+      <div class="ambiente__foco"></div>
+      <div class="ambiente__grano"></div>
+    </div>
     <a class="saltar" href="#contenido">
       Saltar al contenido
     </a>
@@ -95,6 +102,65 @@ const imagenAbsoluta = new URL(imagen, Astro.site);
     <Aviso />
   </body>
 </html>
+
+<script>
+  /*
+   * Efectos globales. Todos son mejoras: sin este script la página se ve y funciona igual, solo más quieta.
+   * Se apagan con movimiento reducido; el foco y el imán, además, solo con puntero fino (mouse o trackpad).
+   */
+  const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fino = window.matchMedia('(pointer: fine)').matches;
+
+  // 1. Foco de estadio: la luz del fondo sigue al puntero.
+  const ambiente = document.querySelector<HTMLElement>('[data-ambiente]');
+  if (ambiente && fino && !reducir) {
+    let cuadro = 0;
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        cancelAnimationFrame(cuadro);
+        cuadro = requestAnimationFrame(() => {
+          ambiente.style.setProperty('--px', `${e.clientX}px`);
+          ambiente.style.setProperty('--py', `${e.clientY}px`);
+        });
+      },
+      { passive: true },
+    );
+  }
+
+  // 2. Botones imán: se corren hasta 6 px hacia el puntero y vuelven al salir.
+  if (fino && !reducir) {
+    document.querySelectorAll<HTMLElement>('.boton').forEach((boton) => {
+      boton.addEventListener('pointermove', (e) => {
+        const caja = boton.getBoundingClientRect();
+        const dx = (e.clientX - (caja.left + caja.width / 2)) / (caja.width / 2);
+        const dy = (e.clientY - (caja.top + caja.height / 2)) / (caja.height / 2);
+        boton.style.setProperty('--imanx', `${(dx * 6).toFixed(1)}px`);
+        boton.style.setProperty('--imany', `${(dy * 4).toFixed(1)}px`);
+      });
+      boton.addEventListener('pointerleave', () => {
+        boton.style.removeProperty('--imanx');
+        boton.style.removeProperty('--imany');
+      });
+    });
+  }
+
+  // 3. Aparición al hacer scroll donde el CSS no la soporta (animation-timeline: view()).
+  if (!reducir && !CSS.supports('animation-timeline: view()') && 'IntersectionObserver' in window) {
+    document.documentElement.classList.add('revelar-js');
+    const obs = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((en) => {
+          if (!en.isIntersecting) return;
+          en.target.classList.add('visible');
+          obs.unobserve(en.target);
+        });
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    );
+    document.querySelectorAll('.revelar').forEach((el) => obs.observe(el));
+  }
+</script>
 
 <style>
   .saltar {

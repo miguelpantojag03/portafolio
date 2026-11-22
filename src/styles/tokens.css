@@ -1,6 +1,7 @@
 /*
- * Tokens de diseño: Cancha.
+ * Tokens de diseño: Cancha de noche.
  * Azul cobalto como color principal y verde cancha como segundo color. Sin blanco ni negro puros.
+ * El tema oscuro (Noche) es el predeterminado; Día queda como opción en el selector.
  * Fuente única de verdad para color, tipografía, espaciado y movimiento.
  * Justificación de cada valor: docs/design-plan.md
  */
@@ -19,24 +20,35 @@
   --cancha-2: #0a6e44;
   --cal: #d4fbe8;
 
-  /* Roles: Día (claro) */
-  --fondo: var(--hielo);
-  --superficie: var(--hielo-2);
-  --tinta: var(--marino);
-  --tinta-suave: #34507f;
-  --accion: var(--azul);
-  --sobre-accion: var(--hielo);
-  --resalte: var(--verde);
-  --exito: var(--verde);
-  --error: #b3261e;
-  color-scheme: light;
+  /* Roles: Noche (predeterminado). Azul casi negro, superficies de vidrio y acentos que brillan. */
+  --fondo: #050b1c;
+  --fondo-2: #081332;
+  --superficie: #0c1838;
+  --superficie-2: #12214a;
+  --vidrio: color-mix(in srgb, #0f1d44 62%, transparent);
+  --borde: color-mix(in srgb, #9fb4e0 14%, transparent);
+  --borde-fuerte: color-mix(in srgb, #9fb4e0 30%, transparent);
+  --tinta: var(--hielo);
+  --tinta-suave: #9fb0d6;
+  --accion: var(--azul-claro);
+  --sobre-accion: #050b1c;
+  --resalte: var(--verde-vivo);
+  --exito: var(--verde-vivo);
+  --error: #ff8a80;
+  --degradado: linear-gradient(110deg, #7c9bff 0%, #5ee0b4 60%, #34d399 100%);
+  --brillo:
+    0 0 0 1px color-mix(in srgb, #7c9bff 35%, transparent),
+    0 24px 70px -24px color-mix(in srgb, #3b5bff 75%, transparent);
+  --sombra: 0 30px 60px -30px rgb(0 0 0 / 0.7);
+  --ambiente: 1;
+  color-scheme: dark;
 
   /* Tipografía */
   --familia: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
   --mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
   --t-cartel: clamp(3.25rem, 7.4vw, 8.5rem);
   --t-5: clamp(2.25rem, 6vw, 5.4rem);
-  --t-4: clamp(2rem, 4vw, 2.5rem);
+  --t-4: clamp(2rem, 4vw, 2.75rem);
   --t-3: clamp(1.5rem, 3vw, 1.875rem);
   --t-2: 1.375rem;
   --t-1: 1.0625rem;
@@ -60,8 +72,8 @@
 
   /* Forma: según jerarquía */
   --radio-boton: 999px;
-  --radio-tarjeta: 20px;
-  --radio-imagen: 10px;
+  --radio-tarjeta: 22px;
+  --radio-imagen: 12px;
   --trazo: 2px;
 
   /* Movimiento */
@@ -77,33 +89,29 @@
   --z-aviso: 30;
 }
 
-/* Noche (oscuro): paleta propia. La acción pasa a azul claro; el verde queda para la cancha y los resaltes. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema='dia']) {
-    --fondo: var(--azul-noche);
-    --superficie: #10265a;
-    --tinta: var(--hielo);
-    --tinta-suave: #9fb4e0;
-    --accion: var(--azul-claro);
-    --sobre-accion: var(--azul-noche);
-    --resalte: var(--verde-vivo);
-    --exito: var(--verde-vivo);
-    --error: #ff8a80;
-    color-scheme: dark;
-  }
-}
-
-:root[data-tema='noche'] {
-  --fondo: var(--azul-noche);
-  --superficie: #10265a;
-  --tinta: var(--hielo);
-  --tinta-suave: #9fb4e0;
-  --accion: var(--azul-claro);
-  --sobre-accion: var(--azul-noche);
-  --resalte: var(--verde-vivo);
-  --exito: var(--verde-vivo);
-  --error: #ff8a80;
-  color-scheme: dark;
+/* Día (claro): solo si la persona lo elige en el selector. */
+:root[data-tema='dia'] {
+  --fondo: var(--hielo);
+  --fondo-2: #dbe6ff;
+  --superficie: var(--hielo-2);
+  --superficie-2: #b8ceff;
+  --vidrio: color-mix(in srgb, var(--hielo) 70%, transparent);
+  --borde: color-mix(in srgb, var(--marino) 14%, transparent);
+  --borde-fuerte: color-mix(in srgb, var(--marino) 30%, transparent);
+  --tinta: var(--marino);
+  --tinta-suave: #34507f;
+  --accion: var(--azul);
+  --sobre-accion: var(--hielo);
+  --resalte: var(--verde);
+  --exito: var(--verde);
+  --error: #b3261e;
+  --degradado: linear-gradient(110deg, #1d3fe0 0%, #0b6e8a 55%, #047a4a 100%);
+  --brillo:
+    0 0 0 1px color-mix(in srgb, #1d3fe0 25%, transparent),
+    0 20px 50px -24px color-mix(in srgb, #1d3fe0 55%, transparent);
+  --sombra: 0 24px 50px -30px rgb(10 31 68 / 0.45);
+  --ambiente: 0.45;
+  color-scheme: light;
 }
 
 @media (max-width: 40rem) {

@@ -199,8 +199,10 @@ pre {
   padding-block: var(--entre-secciones);
 }
 
+/* Separador entre secciones: una línea que se apaga hacia los lados. */
 .seccion + .seccion {
-  border-top: 1px solid color-mix(in srgb, var(--tinta) 15%, transparent);
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--borde-fuerte), transparent) 1;
 }
 
 /* Solo con JavaScript: lo que sin JS no funcionaría se oculta. */
@@ -234,4 +236,195 @@ html:not(.js) .requiere-js {
     opacity: 0;
     translate: 0 2.5rem;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Cancha de noche: fondo ambiental, vidrio, degradados y numeración.  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Fondo ambiental fijo detrás de todo: luces de estadio (auroras azul y verde que derivan despacio),
+ * una rejilla tenue que se desvanece hacia abajo y un foco que sigue al puntero (ver Base.astro).
+ */
+.ambiente {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: var(--ambiente);
+}
+
+.ambiente__aurora {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.38;
+  will-change: transform;
+}
+
+.ambiente__aurora--azul {
+  top: -25vmax;
+  right: -15vmax;
+  background: radial-gradient(closest-side, #2a4dff, transparent);
+  animation: derivar 26s ease-in-out infinite alternate;
+}
+
+.ambiente__aurora--verde {
+  bottom: -30vmax;
+  left: -20vmax;
+  background: radial-gradient(closest-side, #12b981, transparent);
+  opacity: 0.22;
+  animation: derivar 32s ease-in-out infinite alternate-reverse;
+}
+
+.ambiente__aurora--indigo {
+  top: 35%;
+  left: 40%;
+  width: 40vmax;
+  height: 40vmax;
+  background: radial-gradient(closest-side, #5b3dff, transparent);
+  opacity: 0.16;
+  animation: derivar 40s ease-in-out infinite alternate;
+}
+
+.ambiente__rejilla {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(var(--borde) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, var(--borde) 1px, transparent 1px) 0 0 / 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 20%, transparent 75%);
+  opacity: 0.55;
+}
+
+/* El foco: un círculo de luz que sigue al puntero. Lo mueve el script de Base.astro con --px y --py. */
+.ambiente__foco {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    36rem circle at var(--px, 50%) var(--py, -20%),
+    color-mix(in srgb, var(--azul-claro) 11%, transparent),
+    transparent 60%
+  );
+  transition: opacity var(--dur-larga) var(--curva);
+}
+
+/* Grano fino para que los degradados no se vean planos. */
+.ambiente__grano {
+  position: absolute;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+@keyframes derivar {
+  to {
+    transform: translate(-8vmax, 6vmax) scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambiente__aurora {
+    animation: none;
+  }
+}
+
+/* Vidrio: tarjetas translúcidas con borde fino y desenfoque del fondo. */
+.vidrio {
+  background: var(--vidrio);
+  border: 1px solid var(--borde);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: var(--sombra);
+}
+
+/* Texto con el degradado azul → verde de la marca. */
+.degradado {
+  background: var(--degradado);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (forced-colors: active) {
+  .degradado {
+    color: CanvasText;
+    background: none;
+  }
+}
+
+/*
+ * Numeración de secciones: «01 / Proyectos». Ayuda a ubicarse al bajar.
+ * El texto alternativo vacío ("/ ''") evita que los lectores de pantalla lean el número.
+ */
+main {
+  counter-reset: seccion;
+}
+
+.seccion .titulo-seccion::before {
+  counter-increment: seccion;
+  content: '0' counter(seccion) ' /';
+  content: '0' counter(seccion) ' /' / '';
+  display: block;
+  margin-bottom: var(--e-3);
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-stretch: 100%;
+  letter-spacing: 0.08em;
+  color: var(--resalte);
+}
+
+/* Botones con brillo: el principal lleva el degradado y una luz debajo. */
+.boton--principal {
+  background: var(--degradado);
+  border-color: transparent;
+  color: var(--sobre-accion);
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--accion) 80%, transparent);
+}
+
+.boton--principal:hover {
+  background: var(--degradado);
+  border-color: transparent;
+  color: var(--sobre-accion);
+  box-shadow: 0 16px 40px -12px color-mix(in srgb, var(--resalte) 80%, transparent);
+  filter: brightness(1.08);
+}
+
+.boton:not(.boton--principal) {
+  border-color: var(--borde-fuerte);
+  background: var(--vidrio);
+}
+
+.boton:not(.boton--principal):hover {
+  border-color: var(--accion);
+  background: color-mix(in srgb, var(--accion) 14%, transparent);
+  color: var(--tinta);
+}
+
+/* Imán: los botones se acercan un poco al puntero (script en Base.astro). Usa `translate` para no pisar el hover. */
+.boton {
+  translate: var(--imanx, 0) var(--imany, 0);
+  transition-property: background-color, color, border-color, transform, box-shadow, translate, filter;
+}
+
+/*
+ * Aparición al hacer scroll donde no hay animaciones ligadas al scroll (Firefox, Safari):
+ * el script de Base.astro pone .revelar-js en <html> y .visible en cada bloque al entrar en pantalla.
+ */
+html.revelar-js .revelar {
+  opacity: 0;
+  translate: 0 2.5rem;
+  transition:
+    opacity 700ms var(--curva),
+    translate 700ms var(--curva);
+}
+
+html.revelar-js .revelar.visible {
+  opacity: 1;
+  translate: 0 0;
 }

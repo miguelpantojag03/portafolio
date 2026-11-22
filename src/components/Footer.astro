@@ -77,7 +77,10 @@ const anio = new Date().getFullYear();
     overflow: hidden;
     margin-top: var(--e-8);
     padding-block: var(--e-9) var(--e-6);
-    background: var(--azul-noche);
+    border-top: 1px solid color-mix(in srgb, var(--azul-claro) 25%, transparent);
+    background:
+      radial-gradient(60% 120% at 15% 0%, color-mix(in srgb, var(--azul) 30%, transparent), transparent 70%),
+      linear-gradient(180deg, #081634, #040916);
     color: var(--hielo);
     font-size: 0.9375rem;
   }

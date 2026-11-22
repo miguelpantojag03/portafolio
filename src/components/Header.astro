@@ -71,7 +71,7 @@ const ruta = Astro.url.pathname;
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: color-mix(in srgb, var(--fondo) 82%, transparent);
+    background: color-mix(in srgb, var(--fondo) 72%, transparent);
     backdrop-filter: blur(14px) saturate(1.4);
     -webkit-backdrop-filter: blur(14px) saturate(1.4);
     border-bottom: 1px solid transparent;
@@ -81,8 +81,8 @@ const ruta = Astro.url.pathname;
   }
 
   .cabecera[data-scroll]::before {
-    border-bottom-color: color-mix(in srgb, var(--tinta) 12%, transparent);
-    box-shadow: 0 10px 30px -24px color-mix(in srgb, var(--azul-noche) 60%, transparent);
+    border-bottom-color: var(--borde);
+    box-shadow: 0 12px 40px -20px rgb(0 0 0 / 0.6);
   }
 
   /* Progreso de lectura: una línea verde que se llena al bajar. Solo donde hay scroll-timeline. */
@@ -162,8 +162,9 @@ const ruta = Astro.url.pathname;
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: var(--azul);
-    color: var(--hielo);
+    background: var(--degradado);
+    color: var(--sobre-accion);
+    box-shadow: 0 0 18px -2px color-mix(in srgb, var(--accion) 70%, transparent);
     font-size: 0.8125rem;
     font-weight: 900;
     font-stretch: 125%;
@@ -187,7 +188,8 @@ const ruta = Astro.url.pathname;
     bottom: 0.55rem;
     height: 2px;
     border-radius: 2px;
-    background: currentColor;
+    background: var(--degradado);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accion) 80%, transparent);
     transform: scaleX(0);
     transition: transform var(--dur-media) var(--curva);
   }
@@ -221,7 +223,9 @@ const ruta = Astro.url.pathname;
       justify-content: center;
       gap: var(--e-7);
       padding: var(--e-8) var(--margen);
-      background: var(--fondo);
+      background:
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--azul) 35%, transparent), transparent 55%),
+        var(--fondo);
       visibility: hidden;
       opacity: 0;
       transition:
@@ -276,7 +280,7 @@ const ruta = Astro.url.pathname;
     align-items: center;
     min-height: 2.75rem;
     padding: var(--e-2) var(--e-4);
-    border: var(--trazo) solid var(--tinta);
+    border: 1px solid var(--borde-fuerte);
     border-radius: var(--radio-boton);
     background: transparent;
     font-weight: 650;
