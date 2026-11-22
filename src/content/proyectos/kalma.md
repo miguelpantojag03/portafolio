@@ -8,6 +8,9 @@ contexto: 'Materia Diseño de Interfaces'
 rol: 'Investigación, diseño de la interfaz y desarrollo de la app'
 fecha: 'Octubre de 2026'
 fechaIso: '2026-10'
+portada:
+  src: '../../assets/proyectos/kalma/portada.png'
+  alt: 'Ilustración de Kalma: un celular grabando un dictado de 10 segundos, con los datos que entendió (migraña, sueño, café), un patrón entre sueño y dolor y el calendario del reporte para el médico.'
 enlaces:
   - texto: 'Código en GitHub'
     url: 'https://github.com/miguelpantojag03/Kalma'

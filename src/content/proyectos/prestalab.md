@@ -9,6 +9,9 @@ contexto: 'Proyecto de la universidad'
 rol: 'Diseño y desarrollo del backend, el frontend y el despliegue'
 fecha: 'Octubre de 2026'
 fechaIso: '2026-10'
+portada:
+  src: '../../assets/proyectos/prestalab/portada.png'
+  alt: 'Ilustración del panel web de PrestaLab: préstamos del laboratorio con su estado (pendiente, aprobado, vencido, devuelto) y una respuesta de la API que aprueba un préstamo.'
 enlaces:
   - texto: 'Código en GitHub'
     url: 'https://github.com/miguelpantojag03/PRESTALAB'
