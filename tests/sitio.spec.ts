@@ -181,3 +181,17 @@ test('trabajo en equipo muestra la foto y los tres testimonios', async ({ page }
     await expect(seccion.getByText(nombre, { exact: true })).toBeVisible();
   }
 });
+
+test('fuera del código muestra los pasatiempos y el personaje saluda al tocarlo', async ({ page }) => {
+  await page.goto('/#fuera-del-codigo');
+  const seccion = page.locator('#fuera-del-codigo');
+  for (const p of ['Fútbol', 'FC Barcelona', 'Videojuegos', 'Conocer lugares nuevos']) {
+    await expect(seccion.getByRole('heading', { level: 3, name: p })).toBeVisible();
+  }
+  await seccion.getByRole('button', { name: 'Saludar a mi personaje' }).click();
+  await expect(seccion.locator('[data-globo]')).toHaveText('¡Visca el Barça!');
+  await expect(seccion.getByRole('link', { name: 'Mira Ascua, mi videojuego' })).toHaveAttribute(
+    'href',
+    '/proyectos/ascua',
+  );
+});

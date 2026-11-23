@@ -1,5 +1,6 @@
 ---
 import SelectorTema from '@/components/SelectorTema.astro';
+import Personaje from '@/components/Personaje.astro';
 import { perfil } from '@/data/perfil';
 
 const enlaces = [
@@ -16,7 +17,7 @@ const ruta = Astro.url.pathname;
   <div class="contenedor cabecera__fila">
     <a class="marca" href="/" aria-current={ruta === '/' ? 'page' : undefined}>
       <span class="marca__dorsal" aria-hidden="true">
-        10
+        <Personaje variante="cara" id="pj-logo" />
       </span>
       {perfil.nombreCorto}
     </a>
@@ -159,10 +160,14 @@ const ruta = Astro.url.pathname;
   .marca__dorsal {
     display: grid;
     place-items: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    overflow: hidden;
     border-radius: 50%;
-    background: var(--degradado);
+    border: 2px solid transparent;
+    background:
+      radial-gradient(circle at 50% 30%, #1b2f6e, #0a1430) padding-box,
+      var(--degradado) border-box;
     color: var(--sobre-accion);
     box-shadow: 0 0 18px -2px color-mix(in srgb, var(--accion) 70%, transparent);
     font-size: 0.8125rem;
@@ -171,8 +176,14 @@ const ruta = Astro.url.pathname;
     transition: transform var(--dur-media) var(--curva-rebote);
   }
 
+  /* La cara del personaje llena el círculo del logo. */
+  .marca__dorsal :global(.personaje) {
+    width: 115%;
+    margin-top: 12%;
+  }
+
   .marca:hover .marca__dorsal {
-    transform: rotate(-12deg) scale(1.1);
+    transform: rotate(-8deg) scale(1.12);
   }
 
   .menu__lista a {

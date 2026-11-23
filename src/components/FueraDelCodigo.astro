@@ -1,0 +1,317 @@
+---
+/**
+ * Fuera del código: mis pasatiempos y mi personaje, que se puede tocar.
+ * Los textos viven en src/data/perfil.ts (pasatiempos).
+ */
+import Personaje from '@/components/Personaje.astro';
+import { pasatiempos } from '@/data/perfil';
+
+/** Frases del personaje al tocarlo, una por pasatiempo. */
+const frases = [
+  '¡Visca el Barça!',
+  '¿Echamos un partido?',
+  'Una partida más y ya.',
+  '¿A dónde viajamos ahora?',
+  '¡Gooool!',
+];
+---
+
+<section class="seccion" id="fuera-del-codigo" aria-labelledby="fuera-titulo">
+  <div class="contenedor">
+    <h2 id="fuera-titulo" class="titulo-seccion">
+      Fuera del código
+    </h2>
+
+    <div class="fuera">
+      <div class="escenario revelar">
+        <button
+          type="button"
+          class="escenario__boton"
+          data-personaje-boton
+          data-frases={JSON.stringify(frases)}
+          aria-describedby="escenario-ayuda"
+        >
+          <span class="solo-lectores">Saludar a mi personaje</span>
+          <Personaje variante="completo" id="pj-completo" />
+        </button>
+        <p class="escenario__globo" aria-live="polite" data-globo></p>
+        <p id="escenario-ayuda" class="escenario__ayuda">
+          Este soy yo en caricatura. Tócame.
+        </p>
+      </div>
+
+      <ul class="pasatiempos" role="list">
+        {pasatiempos.map((p) => (
+          <li class:list={['pasatiempo', 'revelar', `pasatiempo--${p.id}`]}>
+            <span class="pasatiempo__icono" aria-hidden="true">
+              {p.id === 'futbol' && (
+                <svg viewBox="0 0 24 24" width="26" height="26">
+                  <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  <path d="m12 7.5 3.6 2.6-1.4 4.2H9.8L8.4 10.1Z" fill="currentColor" />
+                  <path
+                    d="M12 2.5v5M15.6 10.1l4.6-1.6M14.2 14.3l2.8 4.2M9.8 14.3 7 18.5M8.4 10.1 3.8 8.5"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                </svg>
+              )}
+              {p.id === 'barca' && (
+                <svg viewBox="0 0 24 24" width="26" height="26">
+                  <path d="M8 3h8l4 3-2 4-2-1v12H8V9L6 10 4 6Z" fill="#004d98" />
+                  <path d="M11 3h2v18h-2zM15 3.5l1 .2V21h-1zM8 3.5l1-.2V21H8z" fill="#a50044" />
+                  <path
+                    d="M8 3h8l4 3-2 4-2-1v12H8V9L6 10 4 6Z"
+                    fill="none"
+                    stroke="#edbb00"
+                    stroke-width="1.2"
+                  />
+                </svg>
+              )}
+              {p.id === 'videojuegos' && (
+                <svg
+                  viewBox="0 0 24 24"
+                  width="26"
+                  height="26"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                >
+                  <path d="M7 8h10a4 4 0 0 1 4 4l.6 4.2a2.4 2.4 0 0 1-4.3 1.8L15.5 16h-7l-1.8 2a2.4 2.4 0 0 1-4.3-1.8L3 12a4 4 0 0 1 4-4Z" />
+                  <path d="M8 11v3M6.5 12.5h3" />
+                  <circle cx="15.5" cy="11.5" r=".6" fill="currentColor" />
+                  <circle cx="17.5" cy="13.5" r=".6" fill="currentColor" />
+                </svg>
+              )}
+              {p.id === 'viajar' && (
+                <svg
+                  viewBox="0 0 24 24"
+                  width="26"
+                  height="26"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" />
+                  <circle cx="12" cy="10" r="2.4" />
+                </svg>
+              )}
+            </span>
+            <h3 class="pasatiempo__titulo">{p.titulo}</h3>
+            <p class="pasatiempo__texto">{p.texto}</p>
+            {p.enlace && (
+              <a class="pasatiempo__enlace" href={p.enlace.href}>
+                {p.enlace.texto}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fuera {
+    display: grid;
+    grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+    gap: var(--e-7);
+    align-items: center;
+  }
+
+  /* El escenario: un círculo central de cancha con luz de reflector. */
+  .escenario {
+    position: relative;
+    padding: var(--e-6) var(--e-5) var(--e-4);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-tarjeta);
+    background:
+      radial-gradient(60% 50% at 50% 30%, color-mix(in srgb, var(--azul) 40%, transparent), transparent 70%),
+      radial-gradient(
+        circle at 50% 100%,
+        transparent 7.9rem,
+        color-mix(in srgb, var(--cal) 18%, transparent) 8rem 8.15rem,
+        transparent 8.2rem
+      ),
+      linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--cancha) 45%, transparent));
+    box-shadow: var(--sombra);
+    overflow: hidden;
+  }
+
+  .escenario__boton {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: var(--radio-tarjeta);
+    transition: transform var(--dur-media) var(--curva-rebote);
+  }
+
+  .escenario__boton:hover {
+    transform: scale(1.02);
+  }
+
+  .escenario__boton:active {
+    transform: scale(0.98);
+  }
+
+  .escenario__globo {
+    position: absolute;
+    top: var(--e-5);
+    left: var(--e-5);
+    max-width: 12rem;
+    padding: var(--e-2) var(--e-4);
+    border-radius: 16px 16px 16px 4px;
+    background: var(--hielo);
+    color: var(--marino);
+    font-weight: 750;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.6);
+    transform-origin: 0 100%;
+    transition:
+      opacity var(--dur-media) var(--curva),
+      scale var(--dur-media) var(--curva-rebote);
+    pointer-events: none;
+  }
+
+  .escenario__globo:empty {
+    opacity: 0;
+    scale: 0.6;
+  }
+
+  .escenario__ayuda {
+    margin-top: var(--e-2);
+    text-align: center;
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
+  }
+
+  .pasatiempos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-4);
+    list-style: none;
+    padding: 0;
+  }
+
+  .pasatiempo {
+    display: grid;
+    align-content: start;
+    gap: var(--e-2);
+    padding: var(--e-5);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-tarjeta);
+    background: var(--vidrio);
+    backdrop-filter: blur(12px);
+    transition:
+      border-color var(--dur-media) var(--curva),
+      box-shadow var(--dur-media) var(--curva),
+      translate var(--dur-media) var(--curva);
+  }
+
+  .pasatiempo:hover {
+    border-color: color-mix(in srgb, var(--accion) 55%, transparent);
+    box-shadow: var(--brillo);
+    translate: 0 -3px;
+  }
+
+  /* La tarjeta del Barça lleva sus colores en el borde. */
+  .pasatiempo--barca {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--superficie), var(--superficie)) padding-box,
+      linear-gradient(120deg, #004d98, #a50044 60%, #edbb00) border-box;
+  }
+
+  .pasatiempo__icono {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--e-2);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--accion) 14%, transparent);
+    color: var(--accion);
+  }
+
+  .pasatiempo--futbol .pasatiempo__icono {
+    background: color-mix(in srgb, var(--resalte) 14%, transparent);
+    color: var(--resalte);
+  }
+
+  .pasatiempo--barca .pasatiempo__icono {
+    background: color-mix(in srgb, #edbb00 14%, transparent);
+  }
+
+  .pasatiempo--viajar .pasatiempo__icono {
+    background: color-mix(in srgb, #fbbf77 16%, transparent);
+    color: #fbbf77;
+  }
+
+  .pasatiempo__titulo {
+    font-size: var(--t-2);
+    font-stretch: 110%;
+    font-weight: 800;
+  }
+
+  .pasatiempo__texto {
+    color: var(--tinta-suave);
+  }
+
+  .pasatiempo__enlace {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 650;
+    color: var(--accion);
+  }
+
+  @media (max-width: 64rem) {
+    .fuera {
+      grid-template-columns: 1fr;
+    }
+
+    .escenario {
+      max-width: 24rem;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .pasatiempos {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Al tocar el personaje: patea el balón y dice una frase (se anuncia también a lectores de pantalla).
+  const boton = document.querySelector<HTMLButtonElement>('[data-personaje-boton]');
+  const globo = document.querySelector<HTMLElement>('[data-globo]');
+
+  if (boton && globo) {
+    const frases = JSON.parse(boton.dataset.frases ?? '[]') as string[];
+    const svg = boton.querySelector<SVGSVGElement>('[data-personaje]');
+    let indice = 0;
+    let temporizador: number | undefined;
+
+    boton.addEventListener('click', () => {
+      globo.textContent = frases[indice % frases.length] ?? '';
+      indice++;
+      svg?.removeAttribute('data-patea');
+      // Forzar el reinicio de la animación si se toca varias veces seguidas.
+      void svg?.getBoundingClientRect();
+      svg?.setAttribute('data-patea', '');
+      window.clearTimeout(temporizador);
+      temporizador = window.setTimeout(() => {
+        svg?.removeAttribute('data-patea');
+        globo.textContent = '';
+      }, 2200);
+    });
+
+    // El easter egg «gol» también hace patear al personaje.
+    document.addEventListener('portafolio:gol', () => boton.click());
+  }
+</script>

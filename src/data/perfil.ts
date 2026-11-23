@@ -189,3 +189,35 @@ export const testimonios: Testimonio[] = [
       'Durante los proyectos académicos ha demostrado habilidades para analizar problemas, aportar ideas y encontrar soluciones desde el área de la programación y el desarrollo de software. Además, tiene una buena disposición para aprender cosas nuevas, compartir conocimientos y apoyar a sus compañeros cuando es necesario. Es alguien con quien se puede trabajar de manera organizada y responsable.',
   },
 ];
+
+export type Pasatiempo = {
+  id: 'futbol' | 'barca' | 'videojuegos' | 'viajar';
+  titulo: string;
+  texto: string;
+  enlace?: { texto: string; href: string };
+};
+
+/** Fuera del código: lo que me gusta cuando no estoy programando. */
+export const pasatiempos: Pasatiempo[] = [
+  {
+    id: 'futbol',
+    titulo: 'Fútbol',
+    texto: 'Lo juego y lo veo siempre que puedo. Por eso este portafolio es una cancha.',
+  },
+  {
+    id: 'barca',
+    titulo: 'FC Barcelona',
+    texto: 'Soy fanático del Barça. Por eso mi personaje lleva la camiseta blaugrana.',
+  },
+  {
+    id: 'videojuegos',
+    titulo: 'Videojuegos',
+    texto: 'Me gusta mucho jugarlos, y también hacerlos.',
+    enlace: { texto: 'Mira Ascua, mi videojuego', href: '/proyectos/ascua' },
+  },
+  {
+    id: 'viajar',
+    titulo: 'Conocer lugares nuevos',
+    texto: 'Me gusta viajar y descubrir sitios que no conozco.',
+  },
+];

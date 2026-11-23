@@ -1,0 +1,331 @@
+---
+/**
+ * Mi personaje en caricatura, dibujado a mano en SVG a partir de una foto.
+ * Pelo ondulado con flequillo, ceja con corte, mirada tranquila, lunar en la mejilla
+ * y la camiseta blaugrana (solo los colores, sin escudo).
+ *
+ * - variante="completo": cuerpo entero, con balón. Es un botón: al tocarlo patea y saluda.
+ * - variante="cara": solo la cabeza, para la cabecera. Es decorativa.
+ * Los ojos siguen al puntero y parpadea solo (ver el script). Con movimiento reducido, se queda quieto.
+ */
+interface Props {
+  variante?: 'completo' | 'cara';
+  /** Prefijo único para los id internos del SVG (degradados y recortes). */
+  id: string;
+}
+
+const { variante = 'completo', id } = Astro.props;
+const completo = variante === 'completo';
+// La cara usa el mismo dibujo con otro encuadre.
+const viewBox = completo ? '0 0 320 360' : '84 36 152 184';
+
+const piel = '#c98d64';
+const pielSombra = '#b0734d';
+const pelo = '#1c1411';
+const azul = '#004d98';
+const grana = '#a50044';
+const oro = '#edbb00';
+---
+
+<svg
+  class:list={['personaje', `personaje--${variante}`]}
+  viewBox={viewBox}
+  data-personaje
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <clipPath id={`${id}-torso`}>
+      <path d="M40 360 C44 278 92 242 160 239 C228 242 276 278 280 360 Z"></path>
+    </clipPath>
+    <clipPath id={`${id}-ojo-i`}>
+      <ellipse cx="134" cy="139" rx="13" ry="7.5"></ellipse>
+    </clipPath>
+    <clipPath id={`${id}-ojo-d`}>
+      <ellipse cx="186" cy="139" rx="13" ry="7.5"></ellipse>
+    </clipPath>
+    <radialGradient id={`${id}-cara`} cx="45%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#d79c72"></stop>
+      <stop offset="100%" stop-color={piel}></stop>
+    </radialGradient>
+  </defs>
+
+  <g class="personaje__cuerpo">
+    {completo && (
+      <g class="personaje__torso">
+        <rect x="141" y="192" width="38" height="58" rx="12" fill={pielSombra} />
+        <g clip-path={`url(#${id}-torso)`}>
+          <rect x="30" y="232" width="260" height="130" fill={azul} />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <rect x={58 + i * 48} y="232" width="24" height="130" fill={grana} />
+          ))}
+          <path d="M40 360 C44 278 92 242 160 239" fill="none" stroke="rgb(0 0 0 / .18)" stroke-width="14" />
+        </g>
+        <path
+          d="M131 242 Q160 266 189 242"
+          fill="none"
+          stroke={oro}
+          stroke-width="7"
+          stroke-linecap="round"
+        />
+        <text
+          x="214"
+          y="300"
+          font-size="22"
+          font-weight="900"
+          fill={oro}
+          font-family="Archivo Variable, Archivo, sans-serif"
+        >
+          10
+        </text>
+      </g>
+    )}
+
+    <g class="personaje__cabeza">
+      <!-- Pelo de atrás: ondulado y despeinado, más plano arriba, con los lados cortos (degradado) -->
+      <g fill={pelo}>
+        <path d="M102 148 C96 118 100 92 114 80 C122 66 138 60 152 63 C162 54 182 54 190 63 C206 62 218 74 219 90 C228 104 226 128 220 148 L212 148 C211 130 206 118 198 112 L122 112 C114 120 110 132 109 148 Z"></path>
+        <circle cx="118" cy="80" r="14"></circle>
+        <circle cx="136" cy="68" r="15"></circle>
+        <circle cx="158" cy="62" r="16"></circle>
+        <circle cx="180" cy="64" r="15"></circle>
+        <circle cx="200" cy="72" r="14"></circle>
+        <circle cx="213" cy="88" r="12"></circle>
+        <circle cx="108" cy="96" r="11"></circle>
+      </g>
+      <g fill="#3a2c26" opacity="0.85">
+        <path d="M103 118 L108 150 L113 150 L111 120 Z"></path>
+        <path d="M217 118 L212 150 L207 150 L209 120 Z"></path>
+      </g>
+
+      <!-- Orejas -->
+      <ellipse cx="102" cy="152" rx="10" ry="16" fill={pielSombra}></ellipse>
+      <ellipse cx="218" cy="152" rx="10" ry="16" fill={pielSombra}></ellipse>
+
+      <!-- Cara -->
+      <path
+        d="M106 128 C106 92 130 80 160 80 C190 80 214 92 214 128 C214 168 204 200 160 209 C116 200 106 168 106 128 Z"
+        fill={`url(#${id}-cara)`}
+      ></path>
+      <ellipse cx="128" cy="170" rx="10" ry="6" fill="#d9775f" opacity="0.18"></ellipse>
+      <ellipse cx="192" cy="170" rx="10" ry="6" fill="#d9775f" opacity="0.18"></ellipse>
+
+      <!-- Flequillo ondulado que cae hacia un lado -->
+      <path
+        class="personaje__flequillo"
+        d="M105 116 C107 88 130 74 160 74 C190 74 214 88 216 110 C210 104 204 105 200 112 C196 99 185 95 179 104 C174 95 163 94 158 105 C152 96 140 99 137 112 C133 103 123 106 120 123 C116 113 109 112 105 116 Z"
+        fill={pelo}
+      ></path>
+      <g fill="none" stroke="#3a2a22" stroke-width="2.5" stroke-linecap="round" opacity="0.8">
+        <path d="M130 86 q8 -6 16 0"></path>
+        <path d="M160 80 q8 -6 16 0"></path>
+        <path d="M188 88 q7 -4 13 2"></path>
+        <path d="M118 100 q6 -5 12 0"></path>
+      </g>
+
+      <!-- Cejas: la derecha con el corte -->
+      <g fill="none" stroke={pelo} stroke-linecap="round">
+        <path d="M120 124 Q134 116 148 121" stroke-width="6"></path>
+        <path d="M172 121 Q181 116 190 117" stroke-width="6"></path>
+        <path d="M196 118 Q201 119 204 123" stroke-width="5"></path>
+      </g>
+
+      <!-- Ojos: el blanco, la pupila que sigue al puntero y el párpado tranquilo -->
+      <g class="personaje__ojos">
+        <g class="personaje__ojo">
+          <ellipse cx="134" cy="139" rx="13" ry="7.5" fill="#f4ece6"></ellipse>
+          <g clip-path={`url(#${id}-ojo-i)`}>
+            <g class="personaje__pupila">
+              <circle cx="134" cy="140" r="6.2" fill="#3a2418"></circle>
+              <circle cx="134" cy="140" r="3" fill="#120a06"></circle>
+              <circle cx="136" cy="138" r="1.4" fill="#fff"></circle>
+            </g>
+          </g>
+          <path d="M120 139 C121 129 147 129 148 139 C142 134 126 134 120 139 Z" fill={piel}></path>
+          <path
+            d="M120 138 Q134 131 148 138"
+            fill="none"
+            stroke={pelo}
+            stroke-width="3"
+            stroke-linecap="round"
+          ></path>
+        </g>
+        <g class="personaje__ojo">
+          <ellipse cx="186" cy="139" rx="13" ry="7.5" fill="#f4ece6"></ellipse>
+          <g clip-path={`url(#${id}-ojo-d)`}>
+            <g class="personaje__pupila">
+              <circle cx="186" cy="140" r="6.2" fill="#3a2418"></circle>
+              <circle cx="186" cy="140" r="3" fill="#120a06"></circle>
+              <circle cx="188" cy="138" r="1.4" fill="#fff"></circle>
+            </g>
+          </g>
+          <path d="M172 139 C173 129 199 129 200 139 C194 134 178 134 172 139 Z" fill={piel}></path>
+          <path
+            d="M172 138 Q186 131 200 138"
+            fill="none"
+            stroke={pelo}
+            stroke-width="3"
+            stroke-linecap="round"
+          ></path>
+        </g>
+      </g>
+
+      <!-- Nariz, lunar y boca -->
+      <path
+        d="M161 142 C160 154 156 162 153 166 C158 171 166 171 170 167"
+        fill="none"
+        stroke={pielSombra}
+        stroke-width="3"
+        stroke-linecap="round"
+      ></path>
+      <path
+        d="M151 168 q-4 -1 -3 -5 M169 168 q4 -1 3 -5"
+        fill="none"
+        stroke={pielSombra}
+        stroke-width="2.4"
+        stroke-linecap="round"
+      ></path>
+      <circle cx="140" cy="166" r="1.8" fill="#5a3324"></circle>
+      <g class="personaje__boca">
+        <path d="M144 186 Q152 179 160 182 Q168 179 176 186 Q160 190 144 186 Z" fill="#a65c45"></path>
+        <path d="M146 187 Q160 199 174 187 Q160 191 146 187 Z" fill="#b8694f"></path>
+      </g>
+    </g>
+
+    {completo && (
+      <g class="personaje__balon">
+        <circle cx="270" cy="318" r="22" fill="#f1f4fb" stroke="#0a1430" stroke-width="2" />
+        <path d="M270 308 l9 6 -3.5 10.5 h-11 L261 314 Z" fill="#0a1430" />
+        <path
+          d="M270 296 v12 M279 314 l11 -4 M276 324.5 l6 10 M264 324.5 l-6 10 M261 314 l-11 -4"
+          stroke="#0a1430"
+          stroke-width="2"
+        />
+      </g>
+    )}
+  </g>
+</svg>
+
+<style>
+  .personaje {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .personaje :global(*) {
+    transform-box: fill-box;
+  }
+
+  /* Pupilas: el script pone --ox y --oy según dónde está el puntero (máximo 3 unidades). */
+  .personaje__pupila {
+    transform: translate(var(--ox, 0px), var(--oy, 0px));
+    transition: transform 120ms linear;
+  }
+
+  /* Parpadeo: los ojos se cierran desde el centro. */
+  .personaje__ojo {
+    transform-origin: center;
+    transition: transform 90ms ease-in;
+  }
+
+  .personaje[data-parpadea] .personaje__ojo {
+    transform: scaleY(0.08);
+  }
+
+  .personaje__cabeza {
+    transform-origin: 50% 90%;
+    transition: transform 500ms var(--curva-rebote);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Respira: el cuerpo sube y baja muy poco; el flequillo se mece. */
+    .personaje--completo .personaje__cuerpo {
+      animation: respirar 3.6s ease-in-out infinite;
+    }
+
+    .personaje__flequillo {
+      transform-origin: 30% 10%;
+      animation: mecer 4.8s ease-in-out infinite;
+    }
+
+    .personaje[data-patea] .personaje__balon {
+      animation: patada 900ms var(--curva) both;
+    }
+
+    .personaje[data-patea] .personaje__cabeza {
+      transform: rotate(-6deg);
+    }
+  }
+
+  @keyframes respirar {
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+
+  @keyframes mecer {
+    50% {
+      transform: rotate(-1.5deg);
+    }
+  }
+
+  @keyframes patada {
+    0% {
+      transform: translate(0, 0) rotate(0);
+    }
+    35% {
+      transform: translate(-30px, -120px) rotate(-200deg);
+    }
+    70% {
+      transform: translate(-50px, -10px) rotate(-360deg);
+    }
+    85% {
+      transform: translate(-40px, -30px) rotate(-400deg);
+    }
+    100% {
+      transform: translate(0, 0) rotate(-720deg);
+    }
+  }
+</style>
+
+<script>
+  /*
+   * Vida del personaje: ojos que siguen al puntero y parpadeo cada pocos segundos.
+   * Sirve para todas las copias de la página (la cara de la cabecera y el cuerpo entero).
+   */
+  const personajes = Array.from(document.querySelectorAll<SVGSVGElement>('[data-personaje]'));
+  const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (personajes.length > 0) {
+    let cuadro = 0;
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        cancelAnimationFrame(cuadro);
+        cuadro = requestAnimationFrame(() => {
+          personajes.forEach((p) => {
+            const caja = p.getBoundingClientRect();
+            const dx = e.clientX - (caja.left + caja.width / 2);
+            const dy = e.clientY - (caja.top + caja.height * 0.4);
+            const d = Math.hypot(dx, dy) || 1;
+            const fuerza = Math.min(d / 300, 1) * 3;
+            p.style.setProperty('--ox', `${((dx / d) * fuerza).toFixed(2)}px`);
+            p.style.setProperty('--oy', `${((dy / d) * fuerza * 0.6).toFixed(2)}px`);
+          });
+        });
+      },
+      { passive: true },
+    );
+
+    if (!reducir) {
+      const parpadear = () => {
+        personajes.forEach((p) => p.setAttribute('data-parpadea', ''));
+        window.setTimeout(() => personajes.forEach((p) => p.removeAttribute('data-parpadea')), 140);
+        window.setTimeout(parpadear, 2400 + Math.random() * 3200);
+      };
+      window.setTimeout(parpadear, 1800);
+    }
+  }
+</script>
