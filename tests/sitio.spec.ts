@@ -16,7 +16,10 @@ test('se puede abrir un proyecto y pasar al siguiente', async ({ page }) => {
   await page.goto('/');
   await page.locator('#proyectos').getByRole('link', { name: 'HP: Health Points' }).click();
   await expect(page).toHaveURL(/\/proyectos\/hp$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'HP: Health Points' })).toBeVisible();
+  // En el servidor de desarrollo, la primera visita compila la página: se le da más margen.
+  await expect(page.getByRole('heading', { level: 1, name: 'HP: Health Points' })).toBeVisible({
+    timeout: 15_000,
+  });
   for (const seccion of [
     'El problema',
     'Mi papel',
@@ -189,7 +192,7 @@ test('fuera del código muestra los pasatiempos y el personaje saluda al tocarlo
     await expect(seccion.getByRole('heading', { level: 3, name: p })).toBeVisible();
   }
   await seccion.getByRole('button', { name: 'Saludar a mi personaje' }).click();
-  await expect(seccion.locator('[data-globo]')).toHaveText('¡Visca el Barça!');
+  await expect(seccion.locator('[data-globo]')).toHaveText('¿Tienes un proyecto? Hablemos.');
   await expect(seccion.getByRole('link', { name: 'Mira Ascua, mi videojuego' })).toHaveAttribute(
     'href',
     '/proyectos/ascua',

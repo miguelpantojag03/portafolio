@@ -6,13 +6,15 @@
 import Personaje from '@/components/Personaje.astro';
 import { pasatiempos } from '@/data/perfil';
 
-/** Frases del personaje al tocarlo, una por pasatiempo. */
+/** Frases del personaje al tocarlo: programación y mis proyectos. Van en orden y vuelven a empezar. */
 const frases = [
-  '¡Visca el Barça!',
-  '¿Echamos un partido?',
-  'Una partida más y ya.',
-  '¿A dónde viajamos ahora?',
-  '¡Gooool!',
+  '¿Tienes un proyecto? Hablemos.',
+  'Del reloj al servidor: lo hago completo.',
+  'Primero que funcione, luego lo mejoramos.',
+  'Si se puede romper, le escribo una prueba.',
+  'Cada decisión queda escrita, con el porqué.',
+  'En HP, el celular te quita vida.',
+  'git commit -m "otro golazo"',
 ];
 ---
 
@@ -163,7 +165,7 @@ const frases = [
     position: absolute;
     top: var(--e-5);
     left: var(--e-5);
-    max-width: 12rem;
+    max-width: 15rem;
     padding: var(--e-2) var(--e-4);
     border-radius: 16px 16px 16px 4px;
     background: var(--hielo);
