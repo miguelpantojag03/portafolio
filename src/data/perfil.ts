@@ -28,7 +28,7 @@ export const perfil = {
 export const historia: string[] = [
   'Soy de Pasto. Desde pequeño me la pasaba en el computador, y aprendí HTML y CSS por mi cuenta antes de saber que eso se podía estudiar.',
   'Hoy estudio Ingeniería de Software en la Universidad Cooperativa de Colombia. Me gusta entender el sistema completo: la pantalla que alguien toca, la API que responde y la base de datos que guarda todo. Por eso mis proyectos van del reloj al servidor, y hasta un videojuego.',
-  'Gané un hackathon. Fuera del código, juego fútbol y lo veo siempre que puedo.',
+  'Fuera del código, juego fútbol y lo veo siempre que puedo.',
 ];
 
 /** Lo que estoy haciendo ahora. Actualízalo cada mes o dos. */
@@ -67,13 +67,6 @@ export const trayectoria: ItemTrayectoria[] = [
     detalle:
       'Construí HP (reloj y teléfono), PrestaLab (API y web), Kalma (app móvil con IA) y Ascua (videojuego en Unity).',
   },
-  // Completa y descomenta cuando tengas los datos del hackathon:
-  // {
-  //   fecha: 'Mes de AAAA',
-  //   iso: 'AAAA-MM',
-  //   titulo: 'Ganador del hackathon NOMBRE',
-  //   detalle: 'Qué construimos, mi papel y el premio.',
-  // },
   {
     fecha: 'Segundo semestre de 2024',
     iso: '2024-08',

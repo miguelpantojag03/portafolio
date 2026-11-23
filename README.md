@@ -76,7 +76,7 @@ En [src/data/perfil.ts](src/data/perfil.ts), cambia `ahoraMismo.items` y la fech
 
 ### Trayectoria, tecnologías y textos
 
-Todo está en [src/data/perfil.ts](src/data/perfil.ts). Hay entradas comentadas listas para el hackathon y el curso del SENA.
+Todo está en [src/data/perfil.ts](src/data/perfil.ts). Hay una entrada comentada lista para el curso del SENA.
 
 ## Variables de entorno
 
