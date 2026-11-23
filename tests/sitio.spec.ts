@@ -170,3 +170,14 @@ test('la terminal responde a comandos y a las sugerencias', async ({ page }) => 
   await campo.press('Enter');
   await expect(terminal.getByRole('log')).toContainText('xyz: comando no encontrado');
 });
+
+test('trabajo en equipo muestra la foto y los tres testimonios', async ({ page }) => {
+  await page.goto('/#equipo');
+  const seccion = page.locator('#equipo');
+  await expect(seccion.getByRole('heading', { level: 2, name: /Trabajo en equipo/ })).toBeVisible();
+  await expect(seccion.getByRole('img')).toHaveAttribute('alt', /biblioteca/);
+  await expect(seccion.locator('blockquote')).toHaveCount(3);
+  for (const nombre of ['Joan Mosquera', 'Santiago Ortega', 'Juan Camilo Rosero']) {
+    await expect(seccion.getByText(nombre, { exact: true })).toBeVisible();
+  }
+});

@@ -165,3 +165,27 @@ export const formaDeTrabajo = [
       'Pruebas de dominio, de arquitectura y de integración con una base de datos real. También pruebo el contraste de colores y la seguridad entre cuentas.',
   },
 ];
+
+export type Testimonio = { nombre: string; relacion: string; texto: string };
+
+/** Trabajo en equipo: lo que dicen mis compañeros de proyectos. Textos tal como los escribieron. */
+export const testimonios: Testimonio[] = [
+  {
+    nombre: 'Joan Mosquera',
+    relacion: 'Compañero de proyectos académicos',
+    texto:
+      'He tenido la oportunidad de compartir diferentes proyectos académicos con él y puedo destacar su responsabilidad, compromiso y dedicación como estudiante de Ingeniería de Software. Es una persona que demuestra interés por aprender, busca soluciones a los problemas y se esfuerza por entregar trabajos de calidad. En equipo, se caracteriza por ser colaborador, escuchar las ideas de los demás y aportar soluciones que ayudan a alcanzar los objetivos propuestos.',
+  },
+  {
+    nombre: 'Santiago Ortega',
+    relacion: 'Compañero de Ingeniería de Software',
+    texto:
+      'Como compañero de Ingeniería de Software, considero que es una persona perseverante, responsable y orientada al cumplimiento de sus objetivos. Se destaca por su capacidad de aprendizaje, pensamiento lógico y disposición para asumir nuevos retos. Al trabajar en equipo, mantiene una actitud respetuosa, participa activamente en las actividades y está dispuesto a escuchar diferentes puntos de vista. Su compromiso y actitud positiva contribuyen a generar un buen ambiente de trabajo y al desarrollo exitoso de los proyectos. Es un compañero comprometido, creativo y con buena capacidad para trabajar en equipo.',
+  },
+  {
+    nombre: 'Juan Camilo Rosero',
+    relacion: 'Compañero de proyectos académicos',
+    texto:
+      'Durante los proyectos académicos ha demostrado habilidades para analizar problemas, aportar ideas y encontrar soluciones desde el área de la programación y el desarrollo de software. Además, tiene una buena disposición para aprender cosas nuevas, compartir conocimientos y apoyar a sus compañeros cuando es necesario. Es alguien con quien se puede trabajar de manera organizada y responsable.',
+  },
+];
