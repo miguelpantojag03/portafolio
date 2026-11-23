@@ -2,6 +2,9 @@
 import Cancha from '@/components/Cancha.astro';
 import { perfil } from '@/data/perfil';
 import { obtenerProyectos } from '@/lib/proyectos';
+import { enlaceSolicitud, mensajeSolicitud } from '@/lib/solicitud';
+
+const solicitud = enlaceSolicitud();
 
 const palabras = ['Miguel', 'Ángel', 'Pantoja', 'Guerra'];
 
@@ -47,13 +50,23 @@ const marcador = [
       </p>
       <p class="hero__disponible">{perfil.disponibilidad}</p>
       <div class="hero__acciones">
-        <a class="boton boton--principal" href="#contacto">
-          Escríbeme
+        <a
+          class="boton boton--principal"
+          href={solicitud.href}
+          data-solicitar={mensajeSolicitud()}
+          {...(solicitud.externo ? { target: '_blank', rel: 'noopener' } : {})}
+        >
+          Solicitar un proyecto
         </a>
-        <a class="boton" href="/cv">
-          Ver mi CV
+        <a class="boton" href="#proyectos">
+          Ver mis proyectos
         </a>
       </div>
+      <p class="hero__secundario">
+        <a href="#servicios">Lo que hago</a>
+        <span aria-hidden="true">·</span>
+        <a href="/cv">Ver mi CV</a>
+      </p>
       <dl class="marcador">
         {marcador.map((m, i) => (
           <div class="marcador__dato" style={`--i:${i}`}>
@@ -231,6 +244,28 @@ const marcador = [
     flex-wrap: wrap;
     gap: var(--e-3);
     margin-top: var(--e-6);
+  }
+
+  .hero__secundario {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--e-2) var(--e-3);
+    margin-top: var(--e-3);
+    color: var(--tinta-suave);
+    font-size: 0.9375rem;
+  }
+
+  .hero__secundario a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 600;
+    color: var(--tinta);
+  }
+
+  .hero__secundario a:hover {
+    color: var(--accion);
   }
 
   /* Marcador de estadio: números grandes en tabla, la etiqueta debajo. */

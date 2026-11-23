@@ -19,6 +19,12 @@ export const perfil = {
   queHago: 'Construyo apps completas: del reloj al servidor.',
   disponibilidad: 'Disponible para proyectos freelance, remoto o presencial.',
 
+  /**
+   * WhatsApp con indicativo y sin espacios ni «+», por ejemplo '573001234567'.
+   * Si queda vacío, los botones de «Solicitar un proyecto» llevan al formulario de contacto.
+   */
+  whatsapp: '573215671241',
+
   /** Descripción para buscadores y redes (máx. ~155 caracteres). */
   descripcion:
     'Miguel Ángel Pantoja, estudiante de Ingeniería de Software en Pasto, Colombia. Apps para reloj, móvil, web y videojuegos. Disponible para freelance.',
@@ -156,6 +162,87 @@ export const formaDeTrabajo = [
     titulo: 'Pruebo lo que puede romperse',
     texto:
       'Pruebas de dominio, de arquitectura y de integración con una base de datos real. También pruebo el contraste de colores y la seguridad entre cuentas.',
+  },
+];
+
+export type Servicio = {
+  id: 'automatizaciones' | 'tiendas' | 'web' | 'movil' | 'medida';
+  titulo: string;
+  /** La necesidad del negocio, en sus palabras. */
+  problema: string;
+  /** Qué incluye: cosas concretas. */
+  incluye: string[];
+  /** Dónde se ve que lo sé hacer (opcional). */
+  prueba?: { texto: string; href?: string };
+};
+
+/** Lo que hago para negocios: cada servicio con su necesidad, qué incluye y dónde se ve. */
+export const servicios: Servicio[] = [
+  {
+    id: 'automatizaciones',
+    titulo: 'Automatizaciones',
+    problema: 'Pierdes horas en tareas repetitivas: copiar datos, armar reportes, mandar recordatorios.',
+    incluye: [
+      'Reportes que se arman solos desde tus datos',
+      'Recordatorios y avisos automáticos por correo',
+      'Tareas programadas que corren cada día o cada hora',
+      'Conectar tus hojas de cálculo con otras herramientas',
+    ],
+    prueba: {
+      texto: 'PrestaLab marca préstamos vencidos y envía recordatorios solo',
+      href: '/proyectos/prestalab',
+    },
+  },
+  {
+    id: 'tiendas',
+    titulo: 'Software para tiendas',
+    problema: 'Llevas el inventario en un cuaderno o en Excel y no sabes bien qué vendiste ni qué te falta.',
+    incluye: [
+      'Inventario con alertas de productos por agotarse',
+      'Registro de ventas y cierre de caja',
+      'Reportes de lo más vendido por día, semana o mes',
+      'Usuarios con permisos: dueño, cajero, bodega',
+    ],
+    prueba: {
+      texto: 'PrestaLab: catálogo, préstamos y roles de administrador',
+      href: '/proyectos/prestalab',
+    },
+  },
+  {
+    id: 'web',
+    titulo: 'Páginas web para negocios',
+    problema: 'Tus clientes te buscan en internet y no te encuentran, o tu página no funciona en el celular.',
+    incluye: [
+      'Página rápida que se ve bien en celular',
+      'Catálogo de productos o servicios',
+      'Botón de WhatsApp y formulario de contacto',
+      'Lista para aparecer en Google',
+    ],
+    prueba: { texto: 'Esta misma página la hice yo, de cero' },
+  },
+  {
+    id: 'movil',
+    titulo: 'Apps móviles',
+    problema: 'Quieres que tus clientes o tu equipo tengan tu servicio en el bolsillo.',
+    incluye: [
+      'App para Android e iOS',
+      'Inicio de sesión y datos guardados en la nube',
+      'Notificaciones',
+      'Funciones con inteligencia artificial si las necesitas',
+    ],
+    prueba: { texto: 'Kalma: app móvil con IA', href: '/proyectos/kalma' },
+  },
+  {
+    id: 'medida',
+    titulo: 'Sistemas a la medida',
+    problema: 'Tu negocio funciona distinto y ningún programa de los que existen te sirve.',
+    incluye: [
+      'Reservas, citas, préstamos o pedidos',
+      'Panel de administración con reportes',
+      'Base de datos segura y copias de respaldo',
+      'Documentación para que no dependas de mí',
+    ],
+    prueba: { texto: 'Mira cómo documento cada decisión', href: '/proyectos/prestalab' },
   },
 ];
 

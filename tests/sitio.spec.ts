@@ -8,7 +8,12 @@ test('el inicio dice quién soy, qué hago y cómo contactarme', async ({ page }
   await expect(
     page.getByRole('main').getByText('Construyo apps completas: del reloj al servidor.'),
   ).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Escríbeme' })).toHaveAttribute('href', '#contacto');
+  const hero = page.locator('.hero');
+  await expect(hero.getByRole('link', { name: 'Solicitar un proyecto' })).toHaveAttribute(
+    'href',
+    /^https:\/\/wa\.me\/573215671241\?text=/,
+  );
+  await expect(hero.getByRole('link', { name: 'Ver mis proyectos' })).toHaveAttribute('href', '#proyectos');
   await expect(page.locator('#proyectos .proyecto')).toHaveCount(4);
 });
 
@@ -172,6 +177,21 @@ test('la terminal responde a comandos y a las sugerencias', async ({ page }) => 
   await campo.fill('xyz');
   await campo.press('Enter');
   await expect(terminal.getByRole('log')).toContainText('xyz: comando no encontrado');
+});
+
+test('lo que hago lista los servicios y «Solicitar» abre WhatsApp con el mensaje listo', async ({ page }) => {
+  await page.goto('/#servicios');
+  const seccion = page.locator('#servicios');
+  await expect(seccion.getByRole('heading', { level: 2, name: /Lo que hago/ })).toBeVisible();
+  for (const s of ['Automatizaciones', 'Software para tiendas', 'Páginas web para negocios']) {
+    await expect(seccion.getByRole('heading', { level: 3, name: s })).toBeVisible();
+  }
+  const pedir = seccion.getByRole('link', { name: /^Solicitar Software para tiendas/ });
+  const href = await pedir.getAttribute('href');
+  expect(href).toMatch(/^https:\/\/wa\.me\/573215671241\?text=/);
+  expect(decodeURIComponent(href!.split('text=')[1]!)).toContain('Me interesa: Software para tiendas');
+  await expect(pedir).toHaveAttribute('target', '_blank');
+  await expect(page.locator('#contacto').getByRole('link', { name: /WhatsApp/ })).toBeVisible();
 });
 
 test('trabajo en equipo muestra la foto y los tres testimonios', async ({ page }) => {

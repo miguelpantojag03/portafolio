@@ -1,0 +1,294 @@
+---
+/**
+ * Lo que hago: servicios para negocios. Cada tarjeta dice la necesidad, qué incluye,
+ * dónde se ve que lo sé hacer y un botón para pedirlo. Los textos viven en src/data/perfil.ts.
+ */
+import { servicios } from '@/data/perfil';
+import { enlaceSolicitud, mensajeSolicitud } from '@/lib/solicitud';
+
+const general = enlaceSolicitud();
+
+/** Íconos de trazo, 24×24. */
+const iconos: Record<string, string> = {
+  automatizaciones: 'M13 2 4.5 13.5H11L10 22l8.5-11.5H12L13 2Z',
+  tiendas:
+    'M3 9.5 4.5 4h15L21 9.5M3 9.5c0 1.4 1.1 2.5 2.5 2.5S8 10.9 8 9.5m-5 0h18M8 9.5c0 1.4 1.1 2.5 2.5 2.5h3c1.4 0 2.5-1.1 2.5-2.5m0 0c0 1.4 1.1 2.5 2.5 2.5S21 10.9 21 9.5M5 12v8h14v-8M10 20v-4.5h4V20',
+  web: 'M3 5.5A1.5 1.5 0 0 1 4.5 4h15A1.5 1.5 0 0 1 21 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-13ZM3 8.5h18M6 6.3h.01M8.5 6.3h.01M7 12h6M7 15.5h10',
+  movil:
+    'M7.5 2.5h9A1.5 1.5 0 0 1 18 4v16a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V4a1.5 1.5 0 0 1 1.5-1.5ZM10.5 18.5h3',
+  medida:
+    'M14.7 6.3a4 4 0 0 0-5.3 5.3L3.5 17.5a1.4 1.4 0 0 0 2 2l5.9-5.9a4 4 0 0 0 5.3-5.3l-2.4 2.4-2-.6-.6-2 2.4-2.4Z',
+};
+---
+
+<section class="seccion" id="servicios" aria-labelledby="servicios-titulo">
+  <div class="contenedor">
+    <h2 id="servicios-titulo" class="titulo-seccion">
+      Lo que hago
+    </h2>
+    <p class="entradilla servicios__intro">
+      Soluciones para negocios: me cuentas qué te quita tiempo o dinero y lo convierto en software.
+    </p>
+
+    <ul class="servicios" role="list">
+      {servicios.map((s) => {
+        const enlace = enlaceSolicitud(s.titulo);
+        return (
+          <li class:list={['servicio', 'revelar', `servicio--${s.id}`]} data-servicio>
+            <div class="servicio__cabeza">
+              <span class="servicio__icono" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d={iconos[s.id]} />
+                </svg>
+              </span>
+              <h3 class="servicio__titulo">{s.titulo}</h3>
+            </div>
+            <p class="servicio__problema">{s.problema}</p>
+            <ul class="servicio__incluye" role="list" aria-label={`Qué incluye ${s.titulo}`}>
+              {s.incluye.map((i) => (
+                <li>{i}</li>
+              ))}
+            </ul>
+            <div class="servicio__pie">
+              {s.prueba &&
+                (s.prueba.href ? (
+                  <a class="servicio__prueba" href={s.prueba.href}>
+                    {s.prueba.texto}
+                  </a>
+                ) : (
+                  <p class="servicio__prueba servicio__prueba--texto">{s.prueba.texto}</p>
+                ))}
+              <a
+                class="boton servicio__pedir"
+                href={enlace.href}
+                data-solicitar={mensajeSolicitud(s.titulo)}
+                {...(enlace.externo ? { target: '_blank', rel: 'noopener' } : {})}
+              >
+                Solicitar<span class="solo-lectores"> {s.titulo}</span>
+                {enlace.externo && <span class="solo-lectores"> por WhatsApp (se abre en otra pestaña)</span>}
+              </a>
+            </div>
+          </li>
+        );
+      })}
+
+      <li class="servicio servicio--idea revelar">
+        <h3 class="servicio__titulo">¿No ves lo que necesitas?</h3>
+        <p class="servicio__problema">
+          Cuéntame tu idea. Te digo con sinceridad si la puedo hacer, cómo y en cuánto tiempo.
+        </p>
+        <div class="servicio__acciones">
+          <a
+            class="boton boton--principal"
+            href={general.href}
+            data-solicitar={mensajeSolicitud()}
+            {...(general.externo ? { target: '_blank', rel: 'noopener' } : {})}
+          >
+            Solicitar un proyecto
+          </a>
+          <a class="boton" href="#proyectos">
+            Ver mis proyectos
+          </a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .servicios__intro {
+    max-width: 52ch;
+  }
+
+  .servicios {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-4);
+    margin-top: var(--e-7);
+    list-style: none;
+    padding: 0;
+  }
+
+  /* Tarjeta de vidrio; la luz sigue al puntero (--mx/--my, ver script). */
+  .servicio {
+    --mx: 50%;
+    --my: 0%;
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: var(--e-4);
+    padding: var(--e-6) var(--e-5) var(--e-5);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-tarjeta);
+    background:
+      radial-gradient(
+        22rem circle at var(--mx) var(--my),
+        color-mix(in srgb, var(--accion) 12%, transparent),
+        transparent 60%
+      ),
+      var(--vidrio);
+    backdrop-filter: blur(12px);
+    transition:
+      border-color var(--dur-media) var(--curva),
+      box-shadow var(--dur-media) var(--curva),
+      translate var(--dur-media) var(--curva);
+  }
+
+  .servicio:hover {
+    border-color: color-mix(in srgb, var(--accion) 55%, transparent);
+    box-shadow: var(--brillo);
+    translate: 0 -4px;
+  }
+
+  .servicio__cabeza {
+    display: flex;
+    align-items: center;
+    gap: var(--e-3);
+  }
+
+  .servicio__icono {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--accion) 14%, transparent);
+    color: var(--accion);
+    transition: transform var(--dur-media) var(--curva-rebote);
+  }
+
+  .servicio:hover .servicio__icono {
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .servicio--automatizaciones .servicio__icono,
+  .servicio--medida .servicio__icono {
+    background: color-mix(in srgb, var(--resalte) 14%, transparent);
+    color: var(--resalte);
+  }
+
+  .servicio--tiendas .servicio__icono {
+    background: color-mix(in srgb, #fbbf77 16%, transparent);
+    color: #fbbf77;
+  }
+
+  .servicio__titulo {
+    font-size: var(--t-2);
+    font-stretch: 110%;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .servicio__problema {
+    color: var(--tinta-suave);
+  }
+
+  .servicio__incluye {
+    display: grid;
+    align-content: start;
+    gap: var(--e-2);
+    list-style: none;
+    padding: 0;
+    font-size: 0.9375rem;
+  }
+
+  .servicio__incluye li {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    gap: var(--e-2);
+  }
+
+  /* Visto de cancha: una palomita verde. */
+  .servicio__incluye li::before {
+    content: '';
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.2em;
+    border-radius: 50%;
+    background:
+      no-repeat center / 0.7rem
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m2.5 6.2 2.3 2.3 4.7-5' fill='none' stroke='%23050b1c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+      var(--resalte);
+  }
+
+  .servicio__pie {
+    display: grid;
+    gap: var(--e-3);
+    padding-top: var(--e-4);
+    border-top: 1px solid var(--borde);
+  }
+
+  .servicio__prueba {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--accion);
+  }
+
+  .servicio__prueba--texto {
+    min-height: 0;
+    color: var(--tinta-suave);
+  }
+
+  .servicio__pedir {
+    justify-self: start;
+  }
+
+  /* La última tarjeta invita a contar una idea: borde degradado y fondo con más color. */
+  .servicio--idea {
+    grid-template-rows: auto 1fr auto;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(160deg, color-mix(in srgb, var(--azul) 30%, var(--superficie)), var(--superficie) 70%)
+        padding-box,
+      var(--degradado) border-box;
+  }
+
+  .servicio__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-3);
+  }
+
+  @media (max-width: 64rem) {
+    .servicios {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .servicios {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // La luz de cada tarjeta sigue al puntero.
+  const fino = window.matchMedia('(pointer: fine)');
+  if (fino.matches) {
+    document.querySelectorAll<HTMLElement>('[data-servicio]').forEach((tarjeta) => {
+      tarjeta.addEventListener(
+        'pointermove',
+        (e) => {
+          const caja = tarjeta.getBoundingClientRect();
+          tarjeta.style.setProperty('--mx', `${e.clientX - caja.left}px`);
+          tarjeta.style.setProperty('--my', `${e.clientY - caja.top}px`);
+        },
+        { passive: true },
+      );
+    });
+  }
+</script>
