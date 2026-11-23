@@ -11,6 +11,8 @@ export const perfil = {
   email: 'miguelpantojag03@gmail.com',
   github: 'https://github.com/miguelpantojag03',
   linkedin: 'https://www.linkedin.com/in/miguel-%C3%A1ngel-pantoja-guerra-b5a0b5428',
+  instagram: 'https://www.instagram.com/migpantoja.dev/',
+  instagramUsuario: 'migpantoja.dev',
   universidad: 'Universidad Cooperativa de Colombia',
   semestre: 'quinto semestre',
   grado: 'mayo de 2028',

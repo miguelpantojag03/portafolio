@@ -19,6 +19,8 @@ const datos = {
     email: perfil.email,
     github: perfil.github,
     linkedin: perfil.linkedin,
+    instagram: perfil.instagram,
+    instagramUsuario: perfil.instagramUsuario,
     universidad: perfil.universidad,
     semestre: perfil.semestre,
     grado: perfil.grado,
@@ -575,6 +577,7 @@ const sugerencias = ['ayuda', 'sobre', 'proyectos', 'stack', 'abrir kalma', 'con
           linea(['email     ', { t: perfil.email!, href: `mailto:${perfil.email}` }]);
           linea(['github    ', { t: perfil.github!.replace('https://', ''), href: perfil.github! }]);
           linea(['linkedin  ', { t: 'Miguel Ángel Pantoja Guerra', href: perfil.linkedin! }]);
+          linea(['instagram ', { t: `@${perfil.instagramUsuario}`, href: perfil.instagram! }]);
           vacia();
           linea([
             { t: 'O usa el ', c: 'suave' },
